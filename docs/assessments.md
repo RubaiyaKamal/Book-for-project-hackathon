@@ -1,5 +1,7 @@
 ---
 sidebar_position: 1
+title: "Assessments"
+description: "Course projects and grading criteria"
 ---
 
 # Assessments
@@ -296,6 +298,12 @@ You must:
 - ROS 2 issues: [ROS Answers](https://answers.ros.org/)
 - NVIDIA Isaac: [Isaac Forum](https://forums.developer.nvidia.com/c/agx-autonomous-machines/isaac/67)
 - Gazebo: [Gazebo Answers](https://answers.gazebosim.org/)
+
+## Recommended Resources
+- [ROS 2 Documentation](https://docs.ros.org/en/humble/)
+- [Gazebo Sim Documentation](https://gazebosim.org/docs)
+- [NVIDIA Isaac Sim](https://docs.omniverse.nvidia.com/isaacsim/latest/index.html)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
 
 ## Tips for Success
 
