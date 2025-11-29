@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "description": "AI-Native Textbook for Physical AI & Humanoid Robotics",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RubaiyaKamal/Book-for-project-hackathon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RubaiyaKamal/Book-for-project-hackathon/issues"
+  },
+  "homepage": "https://RubaiyaKamal.github.io/Book-for-project-hackathon#readme",
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",

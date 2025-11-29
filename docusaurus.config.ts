@@ -1,5 +1,5 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -10,14 +10,14 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://your-username.github.io',
+  url: 'https://RubaiyaKamal.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/Book-for-project-hackathon/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'your-username', // Usually your GitHub org/user name.
+  organizationName: 'RubaiyaKamal', // Usually your GitHub org/user name.
   projectName: 'Book-for-project-hackathon', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -40,7 +40,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/your-username/Book-for-project-hackathon/tree/main/',
+            'https://github.com/RubaiyaKamal/Book-for-project-hackathon/tree/main/',
         },
         blog: {
           showReadingTime: true,
@@ -51,7 +51,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/your-username/Book-for-project-hackathon/tree/main/',
+            'https://github.com/RubaiyaKamal/Book-for-project-hackathon/tree/main/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -80,9 +80,9 @@ const config: Config = {
           position: 'left',
           label: 'Textbook',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/your-username/Book-for-project-hackathon',
+          href: 'https://github.com/RubaiyaKamal/Book-for-project-hackathon',
           label: 'GitHub',
           position: 'right',
         },
@@ -134,12 +134,12 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/your-username/Book-for-project-hackathon',
+              href: 'https://github.com/RubaiyaKamal/Book-for-project-hackathon',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Panaversity. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Rubaiya Kamal. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
