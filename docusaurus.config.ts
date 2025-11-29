@@ -69,10 +69,6 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'Physical AI & Humanoid Robotics',
-      logo: {
-        alt: 'Physical AI Logo',
-        src: 'img/logo.svg',
-      },
       items: [
         {
           type: 'docSidebar',
@@ -80,7 +76,7 @@ const config: Config = {
           position: 'left',
           label: 'Textbook',
         },
-        { to: '/blog', label: 'Blog', position: 'left' },
+
         {
           href: 'https://github.com/RubaiyaKamal/Book-for-project-hackathon',
           label: 'GitHub',

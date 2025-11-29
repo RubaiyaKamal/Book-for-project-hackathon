@@ -54,7 +54,7 @@ const sidebars: SidebarsConfig = {
                     items: [
                         'module-2/week-6-7/gazebo-setup',
                         'module-2/week-6-7/urdf-sdf',
-                        'module-2/week-6-7/physics-simulation',
+                        'module-2/week-6-7/physics-sensors',
                         'module-2/week-6-7/unity-visualization',
                     ],
                 },
@@ -97,7 +97,6 @@ const sidebars: SidebarsConfig = {
                         'module-4/week-13/gpt-integration',
                         'module-4/week-13/speech-recognition',
                         'module-4/week-13/multimodal-interaction',
-                        'module-4/week-13/capstone-project',
                     ],
                 },
             ],
@@ -106,10 +105,7 @@ const sidebars: SidebarsConfig = {
             type: 'category',
             label: 'Hardware Requirements',
             items: [
-                'hardware/workstation-requirements',
-                'hardware/edge-computing-kit',
-                'hardware/robot-lab-options',
-                'hardware/economy-kit-guide',
+                'hardware/hardware-requirements',
             ],
         },
         {
