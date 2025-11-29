@@ -339,4 +339,33 @@ export class PersonalizationEngine {
 
         return null; // All chapters completed
     }
+
+    /**
+     * Generate personalization prompt for OpenAI
+     */
+    static getPersonalizationPrompt(profile: any, originalContent: string): string {
+        const difficulty = this.getContentDifficulty(profile);
+        const interests = profile.interests || [];
+        const hardwareExp = profile.hardware_experience || "none";
+
+        return `You are personalizing educational content for a student with the following profile:
+- Software Experience: ${profile.software_experience || "beginner"}
+- Hardware Experience: ${hardwareExp}
+- Interests: ${interests.join(", ") || "General robotics"}
+- Target Difficulty: ${difficulty}
+
+Personalize the following chapter content while:
+1. Adjusting complexity to ${difficulty} level
+2. Adding examples relevant to their interests: ${interests.join(", ")}
+3. ${hardwareExp !== "none" ? `Including practical examples for ${hardwareExp}` : "Focusing on simulation and theory"}
+4. Keeping the same structure and headings
+5. Maintaining all code examples but adjusting comments and explanations
+6. Adding personalized tips in this format: "💡 **Personalized Tip:** [tip]"
+7. Making explanations match their experience level
+
+Original Content:
+${originalContent}
+
+Return the personalized content in markdown format.`;
+    }
 }

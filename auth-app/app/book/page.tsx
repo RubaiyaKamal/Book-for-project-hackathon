@@ -20,15 +20,20 @@ export default function BookReaderPage() {
         sections: [],
     });
     const [loading, setLoading] = useState(true);
+    const [isPersonalized, setIsPersonalized] = useState(false);
+    const [personalizing, setPersonalizing] = useState(false);
+    const [originalContent, setOriginalContent] = useState("");
 
     useEffect(() => {
         async function loadContent() {
             setLoading(true);
+            setIsPersonalized(false);
             try {
                 const response = await fetch(`/api/book-content?id=${activeId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setCurrentContent(data);
+                    setOriginalContent(data.content);
                 } else {
                     setCurrentContent({
                         title: "Error",
@@ -55,6 +60,56 @@ export default function BookReaderPage() {
         if (text) {
             setSelectedText(text);
         }
+    };
+
+    const handlePersonalize = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            if (confirm("You need to log in to personalize content. Go to login page?")) {
+                window.location.href = "/signin";
+            }
+            return;
+        }
+
+        setPersonalizing(true);
+        try {
+            const response = await fetch("/api/personalize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    chapterId: activeId,
+                    originalContent: originalContent,
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCurrentContent({
+                    ...currentContent,
+                    content: data.personalizedContent,
+                });
+                setIsPersonalized(true);
+            } else {
+                const error = await response.json();
+                alert(error.error || "Failed to personalize content");
+            }
+        } catch (error) {
+            console.error("Personalization error:", error);
+            alert("Failed to personalize content. Please try again.");
+        } finally {
+            setPersonalizing(false);
+        }
+    };
+
+    const handleResetContent = () => {
+        setCurrentContent({
+            ...currentContent,
+            content: originalContent,
+        });
+        setIsPersonalized(false);
     };
 
     const renderMarkdown = (markdown: string) => {
@@ -162,6 +217,41 @@ export default function BookReaderPage() {
                             </div>
                         ) : (
                             <>
+                                {/* Personalize Button */}
+                                <div className="mb-6 flex items-center justify-between p-4 bg-goldenrod/10 dark:bg-goldenrod/5 rounded-lg border border-goldenrod/30">
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-2xl">✨</span>
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-dark-brown dark:text-cream">
+                                                {isPersonalized ? "Personalized for You" : "Personalize This Chapter"}
+                                            </h3>
+                                            <p className="text-xs text-dark-brown/70 dark:text-cream/70">
+                                                {isPersonalized
+                                                    ? "Content adapted to your experience level and interests"
+                                                    : "Customize content based on your profile"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        {isPersonalized ? (
+                                            <button
+                                                onClick={handleResetContent}
+                                                className="px-4 py-2 text-sm bg-cream dark:bg-dark-brown text-dark-brown dark:text-cream rounded-lg hover:bg-goldenrod/20 transition-colors border border-dark-brown/10 dark:border-cream/10"
+                                            >
+                                                Reset to Original
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handlePersonalize}
+                                                disabled={personalizing}
+                                                className="px-4 py-2 text-sm bg-goldenrod text-dark-brown rounded-lg hover:bg-goldenrod/90 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {personalizing ? "Personalizing..." : "Personalize Content"}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <div
                                     className="prose prose-lg max-w-none"
                                     dangerouslySetInnerHTML={{

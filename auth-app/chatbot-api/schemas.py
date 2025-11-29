@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional, List
 
 class UserBase(BaseModel):
@@ -14,20 +14,18 @@ class UserLogin(UserBase):
     password: str
 
 class UserProfile(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     software_experience: str
     hardware_experience: str
     interests: List[str]
 
-    class Config:
-        orm_mode = True
-
 class User(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
     profile: Optional[UserProfile] = None
-
-    class Config:
-        orm_mode = True
 
 class Token(BaseModel):
     access_token: str

@@ -1,20 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { Pool } from "@neondatabase/serverless";
 import { PersonalizationEngine } from "@/lib/personalization";
-
-const pool = new Pool({
-    connectionString: process.env.NEON_DATABASE_URL!,
-});
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await auth.api.getSession({
-            headers: req.headers,
+        // Get JWT token from Authorization header
+        const authHeader = req.headers.get("authorization");
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const token = authHeader.substring(7);
+
+        // Fetch user profile from FastAPI
+        const userResponse = await fetch("http://localhost:8000/auth/me", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
 
-        if (!session) {
+        if (!userResponse.ok) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const user = await userResponse.json();
+        const profile = user.profile;
+
+        if (!profile) {
+            return NextResponse.json(
+                { error: "Profile not found. Please complete onboarding." },
+                { status: 404 }
+            );
         }
 
         const { chapterId, originalContent } = await req.json();
@@ -26,35 +41,10 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Get user profile
-        const profileResult = await pool.query(
-            "SELECT * FROM user_profiles WHERE user_id = $1",
-            [session.user.id]
-        );
-
-        if (profileResult.rows.length === 0) {
-            return NextResponse.json(
-                { error: "Profile not found. Please complete onboarding." },
-                { status: 404 }
-            );
-        }
-
-        const profile = profileResult.rows[0];
-
-        // Generate personalized content
+        // Generate personalized content using OpenAI
         const personalizedContent = await generatePersonalizedContent(
             originalContent,
-            profile,
-            chapterId
-        );
-
-        // Track that user personalized this chapter
-        await pool.query(
-            `INSERT INTO user_progress (user_id, chapter_id, started_at, last_accessed)
-       VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-       ON CONFLICT (user_id, chapter_id)
-       DO UPDATE SET last_accessed = CURRENT_TIMESTAMP`,
-            [session.user.id, chapterId]
+            profile
         );
 
         return NextResponse.json({
@@ -62,8 +52,8 @@ export async function POST(req: NextRequest) {
             personalizedContent,
             profile: {
                 difficulty: PersonalizationEngine.getContentDifficulty(profile),
-                learningStyle: profile.learning_style,
-                hasHardware: profile.has_robot_hardware,
+                interests: profile.interests || [],
+                hardwareExperience: profile.hardware_experience,
             },
         });
     } catch (error) {
@@ -77,11 +67,9 @@ export async function POST(req: NextRequest) {
 
 async function generatePersonalizedContent(
     originalContent: string,
-    profile: any,
-    chapterId: string
+    profile: any
 ): Promise<string> {
-    const difficulty = PersonalizationEngine.getContentDifficulty(profile);
-    const systemPrompt = PersonalizationEngine.getChatbotSystemPrompt(profile);
+    const prompt = PersonalizationEngine.getPersonalizationPrompt(profile, originalContent);
 
     // Call OpenAI to personalize content
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -91,26 +79,11 @@ async function generatePersonalizedContent(
             Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-            model: "gpt-4-turbo-preview",
+            model: "gpt-4o-mini",
             messages: [
                 {
-                    role: "system",
-                    content: `${systemPrompt}
-
-You are personalizing textbook chapter content. Adapt the content to match the user's profile while maintaining all key information.
-
-Instructions:
-- Adjust complexity to ${difficulty} level
-- Emphasize ${profile.learning_style} learning approach
-- ${profile.has_robot_hardware ? `Include practical examples for ${profile.hardware_platforms.join(", ")}` : "Focus on simulation and theory"}
-- Keep the same structure and headings
-- Maintain all code examples but adjust comments and explanations
-- Add personalized tips in this format: "💡 Personalized Tip: [tip]"
-- Make explanations match the user's experience level`,
-                },
-                {
                     role: "user",
-                    content: `Personalize this chapter content:\n\n${originalContent.substring(0, 8000)}`,
+                    content: prompt,
                 },
             ],
             temperature: 0.7,
