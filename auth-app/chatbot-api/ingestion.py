@@ -4,7 +4,7 @@ from openai import OpenAI
 from qdrant_client import QdrantClient, models
 
 # Environment variables
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 QDRANT_URL = "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io"
 QDRANT_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo"
 
@@ -35,7 +35,7 @@ def chunk_markdown_content(filepath, chunk_size=500, chunk_overlap=50):
     paragraphs = content.split("\n\n")
     chunks = []
     current_chunk = ""
-    
+
     for paragraph in paragraphs:
         cleaned_paragraph = paragraph.strip()
         if not cleaned_paragraph:
@@ -49,13 +49,13 @@ def chunk_markdown_content(filepath, chunk_size=500, chunk_overlap=50):
                 current_chunk += "\n\n" + cleaned_paragraph
             else:
                 current_chunk = cleaned_paragraph
-    
+
     if current_chunk:
         chunks.append(current_chunk)
 
     if not chunks and content.strip():
         chunks.append(content.strip())
-        
+
     return [{"content": chunk, "metadata": {"source": filepath}} for chunk in chunks]
 
 def get_embeddings(texts):
@@ -85,7 +85,7 @@ def upload_chunks_to_qdrant(chunks_data):
                 payload=chunk["metadata"], # Store source filepath in metadata
             )
         )
-    
+
     qdrant_client.upsert(
         collection_name=COLLECTION_NAME,
         wait=True,
@@ -100,7 +100,7 @@ def process_book_content_and_upload(docs_directory):
         print(f"Processing {md_file}...")
         chunks = chunk_markdown_content(md_file)
         all_chunks.extend(chunks)
-    
+
     print(f"Total chunks generated: {len(all_chunks)}")
     if all_chunks:
         upload_chunks_to_qdrant(all_chunks)
@@ -113,3 +113,5 @@ if __name__ == "__main__":
         print(f"Error: The directory '{docs_path}' does not exist.")
     else:
         process_book_content_and_upload(docs_path)
+
+        
