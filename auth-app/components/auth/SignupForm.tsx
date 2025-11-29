@@ -112,55 +112,55 @@ export default function SignupForm() {
 
     if (step === 1) {
         return (
-            <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold mb-6">Create Your Account</h2>
+            <div className="max-w-md mx-auto p-6 bg-cream dark:bg-dark-brown rounded-lg shadow-lg">
+                <h2 className="text-2xl font-bold mb-6 text-dark-brown dark:text-cream">Create Your Account</h2>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                    <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSignup} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Name</label>
+                        <label className="block text-sm font-medium mb-1 text-dark-brown dark:text-cream">Name</label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) =>
                                 setFormData({ ...formData, name: e.target.value })
                             }
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg focus:ring-2 focus:ring-goldenrod bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <label className="block text-sm font-medium mb-1 text-dark-brown dark:text-cream">Email</label>
                         <input
                             type="email"
                             value={formData.email}
                             onChange={(e) =>
                                 setFormData({ ...formData, email: e.target.value })
                             }
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg focus:ring-2 focus:ring-goldenrod bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream"
                             required
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Password</label>
+                        <label className="block text-sm font-medium mb-1 text-dark-brown dark:text-cream">Password</label>
                         <input
                             type="password"
                             value={formData.password}
                             onChange={(e) =>
                                 setFormData({ ...formData, password: e.target.value })
                             }
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg focus:ring-2 focus:ring-goldenrod bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream"
                             required
                             minLength={8}
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Minimum 8 characters
                         </p>
                     </div>
@@ -168,7 +168,7 @@ export default function SignupForm() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                        className="w-full bg-goldenrod dark:bg-goldenrod text-dark-brown dark:text-dark-brown py-2 rounded-lg hover:bg-goldenrod/90 dark:hover:bg-goldenrod/80 disabled:bg-gray-400 dark:disabled:bg-gray-600 font-semibold"
                     >
                         {loading ? "Creating Account..." : "Continue"}
                     </button>
@@ -177,10 +177,10 @@ export default function SignupForm() {
                 <div className="mt-6">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
+                            <div className="w-full border-t border-gray-300 dark:border-dark-brown/30"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">
+                            <span className="px-2 bg-cream dark:bg-dark-brown text-gray-600 dark:text-cream/70">
                                 Or continue with
                             </span>
                         </div>
@@ -189,14 +189,14 @@ export default function SignupForm() {
                     <div className="mt-4 grid grid-cols-2 gap-3">
                         <button
                             onClick={() => authClient.signIn.social({ provider: "google" })}
-                            className="flex items-center justify-center px-4 py-2 border rounded-lg hover:bg-gray-50"
+                            className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
                         >
                             Google
                         </button>
 
                         <button
                             onClick={() => authClient.signIn.social({ provider: "github" })}
-                            className="flex items-center justify-center px-4 py-2 border rounded-lg hover:bg-gray-50"
+                            className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
                         >
                             GitHub
                         </button>
@@ -208,20 +208,20 @@ export default function SignupForm() {
 
     // Step 2: Background Questionnaire
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-2">Tell Us About Yourself</h2>
-            <p className="text-gray-600 mb-6">
+        <div className="max-w-2xl mx-auto p-6 bg-cream dark:bg-dark-brown rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-2 text-dark-brown dark:text-cream">Tell Us About Yourself</h2>
+            <p className="text-dark-brown/70 dark:text-cream/70 mb-6">
                 This helps us personalize your learning experience
             </p>
 
             <form onSubmit={handleBackgroundSubmit} className="space-y-6">
                 {/* Software Background */}
-                <div className="border-b pb-6">
-                    <h3 className="text-lg font-semibold mb-4">Software Background</h3>
+                <div className="border-b border-gray-300 dark:border-dark-brown/30 pb-6">
+                    <h3 className="text-lg font-semibold mb-4 text-dark-brown dark:text-cream">Software Background</h3>
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 Programming Experience
                             </label>
                             <select
@@ -232,7 +232,7 @@ export default function SignupForm() {
                                         programming_experience: e.target.value,
                                     })
                                 }
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream focus:ring-2 focus:ring-goldenrod"
                                 required
                             >
                                 <option value="">Select level</option>
@@ -244,13 +244,13 @@ export default function SignupForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 Programming Languages You Know
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 {["Python", "C++", "JavaScript", "Java", "C", "Rust"].map(
                                     (lang) => (
-                                        <label key={lang} className="flex items-center">
+                                        <label key={lang} className="flex items-center text-dark-brown dark:text-cream">
                                             <input
                                                 type="checkbox"
                                                 checked={background.known_languages.includes(
@@ -275,7 +275,7 @@ export default function SignupForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 Machine Learning Experience
                             </label>
                             <select
@@ -283,7 +283,7 @@ export default function SignupForm() {
                                 onChange={(e) =>
                                     setBackground({ ...background, ml_experience: e.target.value })
                                 }
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream focus:ring-2 focus:ring-goldenrod"
                                 required
                             >
                                 <option value="">Select level</option>
@@ -297,7 +297,7 @@ export default function SignupForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 ROS (Robot Operating System) Experience
                             </label>
                             <select
@@ -305,7 +305,7 @@ export default function SignupForm() {
                                 onChange={(e) =>
                                     setBackground({ ...background, ros_experience: e.target.value })
                                 }
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream focus:ring-2 focus:ring-goldenrod"
                                 required
                             >
                                 <option value="">Select level</option>
@@ -319,12 +319,12 @@ export default function SignupForm() {
                 </div>
 
                 {/* Hardware Background */}
-                <div className="border-b pb-6">
-                    <h3 className="text-lg font-semibold mb-4">Hardware Background</h3>
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Hardware Background</h3>
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 Robotics Experience
                             </label>
                             <select
@@ -335,7 +335,7 @@ export default function SignupForm() {
                                         robotics_experience: e.target.value,
                                     })
                                 }
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream focus:ring-2 focus:ring-goldenrod"
                                 required
                             >
                                 <option value="">Select level</option>
@@ -347,7 +347,7 @@ export default function SignupForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-2">
+                            <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                 Electronics Knowledge
                             </label>
                             <select
@@ -358,7 +358,7 @@ export default function SignupForm() {
                                         electronics_knowledge: e.target.value,
                                     })
                                 }
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream focus:ring-2 focus:ring-goldenrod"
                                 required
                             >
                                 <option value="">Select level</option>
@@ -384,7 +384,7 @@ export default function SignupForm() {
                                     }
                                     className="mr-2"
                                 />
-                                <span className="text-sm font-medium">
+                                <span className="text-sm font-medium text-dark-brown dark:text-cream">
                                     I have access to robot hardware
                                 </span>
                             </label>
@@ -392,7 +392,7 @@ export default function SignupForm() {
 
                         {background.has_robot_hardware && (
                             <div>
-                                <label className="block text-sm font-medium mb-2">
+                                <label className="block text-sm font-medium mb-2 text-dark-brown dark:text-cream">
                                     Hardware Platforms You Have
                                 </label>
                                 <div className="grid grid-cols-2 gap-2">
@@ -404,7 +404,7 @@ export default function SignupForm() {
                                         "Drone",
                                         "Robotic Arm",
                                     ].map((platform) => (
-                                        <label key={platform} className="flex items-center">
+                                        <label key={platform} className="flex items-center text-dark-brown dark:text-cream">
                                             <input
                                                 type="checkbox"
                                                 checked={background.hardware_platforms.includes(
@@ -433,7 +433,7 @@ export default function SignupForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold"
+                    className="w-full bg-mint dark:bg-mint text-white py-3 rounded-lg hover:bg-mint/90 dark:hover:bg-mint/80 font-semibold disabled:bg-gray-400 dark:disabled:bg-gray-600"
                 >
                     {loading ? "Saving Profile..." : "Complete Setup"}
                 </button>

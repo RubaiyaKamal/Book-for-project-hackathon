@@ -10,7 +10,6 @@ export const auth = betterAuth({
     database: neonAdapter(pool),
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: false,
     },
     socialProviders: {
         google: {
@@ -27,9 +26,7 @@ export const auth = betterAuth({
         updateAge: 60 * 60 * 24, // 1 day
     },
     user: {
-        additionalFields: {
-            // We'll store additional data in user_profiles table
-        },
+        // We'll store additional data in user_profiles table
     },
 });
 

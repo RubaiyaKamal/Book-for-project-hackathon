@@ -39,36 +39,36 @@ export default function SigninForm() {
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6">Welcome Back</h2>
+        <div className="max-w-md mx-auto p-6 bg-cream dark:bg-dark-brown rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-dark-brown dark:text-cream">Welcome Back</h2>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+                <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded">{error}</div>
             )}
 
             <form onSubmit={handleSignin} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <label className="block text-sm font-medium mb-1 text-dark-brown dark:text-cream">Email</label>
                     <input
                         type="email"
                         value={formData.email}
                         onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                         }
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg focus:ring-2 focus:ring-goldenrod bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream"
                         required
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium mb-1">Password</label>
+                    <label className="block text-sm font-medium mb-1 text-dark-brown dark:text-cream">Password</label>
                     <input
                         type="password"
                         value={formData.password}
                         onChange={(e) =>
                             setFormData({ ...formData, password: e.target.value })
                         }
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg focus:ring-2 focus:ring-goldenrod bg-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream"
                         required
                     />
                 </div>
@@ -76,7 +76,7 @@ export default function SigninForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                    className="w-full bg-goldenrod dark:bg-goldenrod text-dark-brown dark:text-dark-brown py-2 rounded-lg hover:bg-goldenrod/90 dark:hover:bg-goldenrod/80 disabled:bg-gray-400 dark:disabled:bg-gray-600 font-semibold"
                 >
                     {loading ? "Signing In..." : "Sign In"}
                 </button>
@@ -85,10 +85,10 @@ export default function SigninForm() {
             <div className="mt-6">
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
+                        <div className="w-full border-t border-gray-300 dark:border-dark-brown/30"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">
+                        <span className="px-2 bg-cream dark:bg-dark-brown text-gray-600 dark:text-cream/70">
                             Or continue with
                         </span>
                     </div>
@@ -97,23 +97,23 @@ export default function SigninForm() {
                 <div className="mt-4 grid grid-cols-2 gap-3">
                     <button
                         onClick={() => authClient.signIn.social({ provider: "google" })}
-                        className="flex items-center justify-center px-4 py-2 border rounded-lg hover:bg-gray-50"
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
                     >
                         Google
                     </button>
 
                     <button
                         onClick={() => authClient.signIn.social({ provider: "github" })}
-                        className="flex items-center justify-center px-4 py-2 border rounded-lg hover:bg-gray-50"
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
                     >
                         GitHub
                     </button>
                 </div>
             </div>
 
-            <p className="mt-4 text-center text-sm text-gray-600">
+            <p className="mt-4 text-center text-sm text-dark-brown/70 dark:text-cream/70">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-blue-600 hover:underline">
+                <Link href="/signup" className="text-goldenrod hover:underline font-semibold">
                     Sign up
                 </Link>
             </p>
