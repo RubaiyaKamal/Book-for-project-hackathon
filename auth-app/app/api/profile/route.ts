@@ -3,13 +3,12 @@ import { auth } from "@/lib/auth";
 import { Pool } from "@neondatabase/serverless";
 
 const pool = new Pool({
-    connectionString: process.env.NEON_DATABASE_URL!,
+    connectionString: process.env.NEON_DATABASE_URL,
 });
 
-// POST: Create or update user profile
+// Create user profile
 export async function POST(req: NextRequest) {
     try {
-        // Get session from Better Auth
         const session = await auth.api.getSession({
             headers: req.headers,
         });
@@ -33,15 +32,29 @@ export async function POST(req: NextRequest) {
             goals,
         } = body;
 
-        // Validate required fields
-        if (!programming_experience || !learning_style || !preferred_pace) {
-            return NextResponse.json(
-                { error: "Missing required fields" },
-                { status: 400 }
-            );
-        }
+        // Ensure the table exists (simple check/create for demo purposes)
+        // In production, use migrations
+        await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_profiles (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(255) UNIQUE NOT NULL,
+        programming_experience VARCHAR(50),
+        known_languages TEXT[],
+        ml_experience VARCHAR(50),
+        ros_experience VARCHAR(50),
+        robotics_experience VARCHAR(50),
+        electronics_knowledge VARCHAR(50),
+        has_robot_hardware BOOLEAN DEFAULT FALSE,
+        hardware_platforms TEXT[],
+        learning_style VARCHAR(50),
+        preferred_pace VARCHAR(50),
+        goals TEXT[],
+        completed_onboarding BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
 
-        // Insert or update profile
         const result = await pool.query(
             `INSERT INTO user_profiles (
         user_id, programming_experience, known_languages, ml_experience,
@@ -68,23 +81,20 @@ export async function POST(req: NextRequest) {
             [
                 session.user.id,
                 programming_experience,
-                known_languages || [],
-                ml_experience || 'none',
-                ros_experience || 'none',
-                robotics_experience || 'none',
-                electronics_knowledge || 'none',
-                has_robot_hardware || false,
-                hardware_platforms || [],
+                known_languages,
+                ml_experience,
+                ros_experience,
+                robotics_experience,
+                electronics_knowledge,
+                has_robot_hardware,
+                hardware_platforms,
                 learning_style,
                 preferred_pace,
-                goals || [],
+                goals,
             ]
         );
 
-        return NextResponse.json({
-            success: true,
-            profile: result.rows[0],
-        });
+        return NextResponse.json(result.rows[0]);
     } catch (error) {
         console.error("Profile creation error:", error);
         return NextResponse.json(
@@ -94,7 +104,7 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// GET: Fetch user profile
+// Get user profile
 export async function GET(req: NextRequest) {
     try {
         const session = await auth.api.getSession({
@@ -111,16 +121,10 @@ export async function GET(req: NextRequest) {
         );
 
         if (result.rows.length === 0) {
-            return NextResponse.json({
-                profile: null,
-                completed_onboarding: false,
-            });
+            return NextResponse.json({ profile: null });
         }
 
-        return NextResponse.json({
-            profile: result.rows[0],
-            completed_onboarding: result.rows[0].completed_onboarding,
-        });
+        return NextResponse.json({ profile: result.rows[0] });
     } catch (error) {
         console.error("Profile fetch error:", error);
         return NextResponse.json(

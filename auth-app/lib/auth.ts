@@ -1,49 +1,36 @@
 import { betterAuth } from "better-auth";
+import { neonAdapter } from "better-auth/adapters/neon";
 import { Pool } from "@neondatabase/serverless";
 
-// Create Neon database pool
 const pool = new Pool({
-    connectionString: process.env.NEON_DATABASE_URL!,
+    connectionString: process.env.NEON_DATABASE_URL,
 });
 
-// Better Auth configuration
 export const auth = betterAuth({
-    database: {
-        provider: "postgres",
-        url: process.env.NEON_DATABASE_URL!,
-    },
+    database: neonAdapter(pool),
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: false, // Set to true in production
-        minPasswordLength: 8,
+        requireEmailVerification: false,
     },
     socialProviders: {
         google: {
-            clientId: process.env.GOOGLE_CLIENT_ID || "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-            enabled: !!process.env.GOOGLE_CLIENT_ID,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         },
         github: {
-            clientId: process.env.GITHUB_CLIENT_ID || "",
-            clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-            enabled: !!process.env.GITHUB_CLIENT_ID,
+            clientId: process.env.GITHUB_CLIENT_ID!,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         },
     },
     session: {
         expiresIn: 60 * 60 * 24 * 7, // 7 days
-        updateAge: 60 * 60 * 24, // Update session every 24 hours
-        cookieCache: {
-            enabled: true,
-            maxAge: 5 * 60, // 5 minutes
-        },
+        updateAge: 60 * 60 * 24, // 1 day
     },
-    advanced: {
-        cookiePrefix: "book-auth",
-        crossSubDomainCookies: {
-            enabled: false,
+    user: {
+        additionalFields: {
+            // We'll store additional data in user_profiles table
         },
     },
 });
 
 export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.Session.user;

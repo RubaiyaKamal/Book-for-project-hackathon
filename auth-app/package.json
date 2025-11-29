@@ -1,7 +1,15 @@
 {
+    "name": "auth-app",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
     "dependencies": {
         "better-auth": "^0.1.0",
-        "@better-auth/react": "^0.1.0",
         "@neondatabase/serverless": "^0.9.0",
         "next": "^14.0.0",
         "react": "^18.2.0",
