@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth";
-import { neonAdapter } from "better-auth/adapters/neon";
 import { Pool } from "@neondatabase/serverless";
 
 const pool = new Pool({
@@ -7,7 +6,7 @@ const pool = new Pool({
 });
 
 export const auth = betterAuth({
-    database: neonAdapter(pool),
+    database: pool,
     emailAndPassword: {
         enabled: true,
     },

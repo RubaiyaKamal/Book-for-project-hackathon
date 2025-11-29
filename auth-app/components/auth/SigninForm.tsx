@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/components/providers/AuthProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SigninForm() {
     const router = useRouter();
+    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [formData, setFormData] = useState({
@@ -20,18 +21,19 @@ export default function SigninForm() {
         setError("");
 
         try {
-            const { data, error } = await authClient.signIn.email({
-                email: formData.email,
-                password: formData.password,
+            const response = await fetch("http://localhost:8000/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
             });
 
-            if (error) {
-                setError(error.message);
-                setLoading(false);
-                return;
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || "Signin failed");
             }
 
-            router.push("/dashboard");
+            const data = await response.json();
+            login(data.access_token);
         } catch (err: any) {
             setError(err.message || "Signin failed");
             setLoading(false);
@@ -96,15 +98,15 @@ export default function SigninForm() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                     <button
-                        onClick={() => authClient.signIn.social({ provider: "google" })}
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
+                        disabled
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     >
                         Google
                     </button>
 
                     <button
-                        onClick={() => authClient.signIn.social({ provider: "github" })}
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg hover:bg-warm-white dark:hover:bg-dark-brown/30 text-dark-brown dark:text-cream"
+                        disabled
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     >
                         GitHub
                     </button>

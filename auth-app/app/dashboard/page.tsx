@@ -1,37 +1,29 @@
 "use client";
 
-import { authClient } from "@/components/providers/AuthProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import Link from "next/link";
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { data: session, isPending } = authClient.useSession();
-    const [profile, setProfile] = useState<any>(null);
+    const { user, loading, logout } = useAuth();
 
     useEffect(() => {
-        if (!isPending && !session) {
+        if (!loading && !user) {
             router.push("/signin");
-        } else if (session) {
-            // Fetch profile data
-            fetch("/api/profile")
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.profile) {
-                        setProfile(data.profile);
-                    }
-                })
-                .catch((err) => console.error("Failed to fetch profile", err));
         }
-    }, [session, isPending, router]);
+    }, [user, loading, router]);
 
-    if (isPending || !session) {
+    if (loading || !user) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-warm-white dark:bg-dark-brown">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-goldenrod dark:border-goldenrod"></div>
             </div>
         );
     }
+
+    const profile = user.profile;
 
     return (
         <div className="min-h-screen bg-warm-white dark:bg-dark-brown">
@@ -45,10 +37,10 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center">
                             <span className="mr-4 text-dark-brown dark:text-cream">
-                                Welcome, {session.user.name}
+                                Welcome, {user.email}
                             </span>
                             <button
-                                onClick={() => authClient.signOut().then(() => router.push("/signin"))}
+                                onClick={logout}
                                 className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
                             >
                                 Sign Out
@@ -81,19 +73,13 @@ export default function DashboardPage() {
                                             <div className="flex justify-between">
                                                 <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Experience:</dt>
                                                 <dd className="text-sm font-medium text-dark-brown dark:text-cream capitalize">
-                                                    {profile.programming_experience}
+                                                    {profile.software_experience}
                                                 </dd>
                                             </div>
                                             <div className="flex justify-between">
-                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Languages:</dt>
+                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Interests:</dt>
                                                 <dd className="text-sm font-medium text-dark-brown dark:text-cream">
-                                                    {profile.known_languages?.join(", ") || "None"}
-                                                </dd>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">ROS Level:</dt>
-                                                <dd className="text-sm font-medium text-dark-brown dark:text-cream capitalize">
-                                                    {profile.ros_experience}
+                                                    {profile.interests?.join(", ") || "None"}
                                                 </dd>
                                             </div>
                                         </dl>
@@ -105,21 +91,9 @@ export default function DashboardPage() {
                                         </h3>
                                         <dl className="mt-2 space-y-2">
                                             <div className="flex justify-between">
-                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Robotics:</dt>
+                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Experience:</dt>
                                                 <dd className="text-sm font-medium text-dark-brown dark:text-cream capitalize">
-                                                    {profile.robotics_experience}
-                                                </dd>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Electronics:</dt>
-                                                <dd className="text-sm font-medium text-dark-brown dark:text-cream capitalize">
-                                                    {profile.electronics_knowledge}
-                                                </dd>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <dt className="text-sm text-dark-brown/80 dark:text-cream/80">Hardware Access:</dt>
-                                                <dd className="text-sm font-medium text-dark-brown dark:text-cream">
-                                                    {profile.has_robot_hardware ? "Yes" : "No"}
+                                                    {profile.hardware_experience}
                                                 </dd>
                                             </div>
                                         </dl>
@@ -127,18 +101,18 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="text-center py-4">
-                                    <p className="text-dark-brown/60 dark:text-cream/60">Loading profile data...</p>
+                                    <p className="text-dark-brown/60 dark:text-cream/60">No profile data available.</p>
                                 </div>
                             )}
                         </div>
 
                         <div className="px-4 py-4 sm:px-6 bg-warm-white/50 dark:bg-dark-brown/50">
-                            <a
-                                href="http://localhost:3000/Book-for-project-hackathon/"
+                            <Link
+                                href="/book"
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark-brown bg-goldenrod hover:bg-goldenrod/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-goldenrod"
                             >
                                 Go to Course Content
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
