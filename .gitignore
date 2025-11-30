@@ -1,9 +1,7 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
-# Production
+# Build outputs
 build/
 .docusaurus/
 .cache-loader
@@ -52,3 +50,6 @@ ENV/
 # Logs
 logs
 *.log
+
+# Vercel
+.vercel
