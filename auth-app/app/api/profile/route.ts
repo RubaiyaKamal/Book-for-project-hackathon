@@ -32,28 +32,9 @@ export async function POST(req: NextRequest) {
             goals,
         } = body;
 
-        // Ensure the table exists (simple check/create for demo purposes)
-        // In production, use migrations
-        await pool.query(`
-      CREATE TABLE IF NOT EXISTS user_profiles (
-        id SERIAL PRIMARY KEY,
-        user_id VARCHAR(255) UNIQUE NOT NULL,
-        programming_experience VARCHAR(50),
-        known_languages TEXT[],
-        ml_experience VARCHAR(50),
-        ros_experience VARCHAR(50),
-        robotics_experience VARCHAR(50),
-        electronics_knowledge VARCHAR(50),
-        has_robot_hardware BOOLEAN DEFAULT FALSE,
-        hardware_platforms TEXT[],
-        learning_style VARCHAR(50),
-        preferred_pace VARCHAR(50),
-        goals TEXT[],
-        completed_onboarding BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
+        // IMPORTANT: The `user_profiles` table should be created using a database migration tool,
+        // not in the API route. For Vercel deployment, you can run migrations as part of your build step.
+        // The CREATE TABLE statement has been removed from this file.
 
         const result = await pool.query(
             `INSERT INTO user_profiles (
