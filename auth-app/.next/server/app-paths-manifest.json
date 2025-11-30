@@ -1,12 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/book-content/route": "app/api/book-content/route.js",
-  "/api/profile/route": "app/api/profile/route.js",
-  "/page": "app/page.js",
-  "/api/personalize/route": "app/api/personalize/route.js",
-  "/signin/page": "app/signin/page.js",
   "/signup/page": "app/signup/page.js",
-  "/api/translate/route": "app/api/translate/route.js",
   "/book/page": "app/book/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/page": "app/page.js"
 }

@@ -6,7 +6,8 @@ import PersonalizeButton from "./PersonalizeButton";
 
 import ReactMarkdown from "react-markdown";
 
-import { useAuth } from "../../lib/auth-client"; // Import useAuth
+import { useAuth } from "@/lib/auth-client"; // Import useAuth
+import { Session } from "@/lib/auth";
 
 
 
@@ -34,7 +35,7 @@ export default function ChapterContent({
 
     const { useSession } = useAuth(); // Use the useAuth hook
 
-    const { data: session } = useSession(); // Get session data
+    const { data: session }: { data: Session | null | undefined } = useSession(); // Get session data
 
 
 
