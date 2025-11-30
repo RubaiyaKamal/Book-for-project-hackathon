@@ -24,6 +24,7 @@ def get_openai_client():
     global openai_client
     if openai_client is None:
         api_key = os.getenv("OPENAI_API_KEY")
+        print(f"DEBUG: OPENAI_API_KEY loaded: {api_key[:5]}...{api_key[-5:]}" if api_key else "DEBUG: OPENAI_API_KEY is None or empty.")
         if not api_key:
             print("ERROR: OPENAI_API_KEY environment variable is not set.")
             raise ValueError("OPENAI_API_KEY environment variable is not set.")
