@@ -1,4 +1,5 @@
 import './globals.css'
+import { AuthProvider } from '@/components/providers/AuthProvider'
 
 export const metadata = {
   title: 'Physical AI Course - Authentication',
@@ -12,7 +13,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }

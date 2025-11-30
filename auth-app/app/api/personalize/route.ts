@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         const token = authHeader.substring(7);
 
         // Fetch user profile from FastAPI
-        const userResponse = await fetch("http://localhost:8000/auth/me", {
+        const userResponse = await fetch("http://127.0.0.1:8000/auth/me", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

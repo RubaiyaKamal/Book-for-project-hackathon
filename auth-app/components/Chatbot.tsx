@@ -44,7 +44,7 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
         setLoading(true);
 
         try {
-            const response = await fetch("http://localhost:8000/chat", {
+            const response = await fetch("http://127.0.0.1:8000/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -54,7 +54,8 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to get response");
+                const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+                throw new Error(errorData.detail || "Failed to get response");
             }
 
             const data = await response.json();
@@ -64,10 +65,11 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
                 sources: data.sources,
             };
             setMessages((prev) => [...prev, assistantMessage]);
-        } catch (error) {
+        } catch (error: any) {
+            console.error("Chat error:", error);
             const errorMessage: Message = {
                 role: "assistant",
-                content: "Sorry, I encountered an error. Please try again.",
+                content: `Error: ${error.message || "Something went wrong"}`,
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
@@ -153,14 +155,14 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
                             <div
                                 key={index}
                                 className={`flex ${message.role === "user"
-                                        ? "justify-end"
-                                        : "justify-start"
+                                    ? "justify-end"
+                                    : "justify-start"
                                     }`}
                             >
                                 <div
                                     className={`max-w-[80%] rounded-lg p-3 ${message.role === "user"
-                                            ? "bg-goldenrod text-dark-brown"
-                                            : "bg-warm-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream border border-dark-brown/10 dark:border-cream/10"
+                                        ? "bg-goldenrod text-dark-brown"
+                                        : "bg-warm-white dark:bg-dark-brown/50 text-dark-brown dark:text-cream border border-dark-brown/10 dark:border-cream/10"
                                         }`}
                                 >
                                     <p className="text-sm whitespace-pre-wrap">

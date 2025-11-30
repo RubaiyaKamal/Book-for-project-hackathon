@@ -56,7 +56,7 @@ export default function SignupForm() {
                 interests: background.interests,
             };
 
-            const response = await fetch("http://localhost:8000/auth/signup", {
+            const response = await fetch("http://127.0.0.1:8000/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ export default function SignupForm() {
             }
 
             // Auto login after signup
-            const loginResponse = await fetch("http://localhost:8000/auth/login", {
+            const loginResponse = await fetch("http://127.0.0.1:8000/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -79,7 +79,11 @@ export default function SignupForm() {
 
             if (loginResponse.ok) {
                 const loginData = await loginResponse.json();
-                login(loginData.access_token);
+                const errorMsg = await login(loginData.access_token);
+                if (errorMsg) {
+                    console.error("Auto-login failed:", errorMsg);
+                    router.push("/signin");
+                }
             } else {
                 router.push("/signin");
             }

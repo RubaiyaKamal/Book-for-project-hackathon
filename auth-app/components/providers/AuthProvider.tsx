@@ -17,7 +17,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     loading: boolean;
-    login: (token: string) => void;
+    login: (token: string) => Promise<string | null>;
     logout: () => void;
 }
 
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
     loading: true,
-    login: () => { },
+    login: async () => "Not implemented",
     logout: () => { },
 });
 
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const token = localStorage.getItem("token");
             if (token) {
                 try {
-                    const response = await fetch("http://localhost:8000/auth/me", {
+                    const response = await fetch("http://127.0.0.1:8000/auth/me", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -62,22 +62,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         initAuth();
     }, []);
 
-    const login = async (token: string) => {
+    const login = async (token: string): Promise<string | null> => {
         localStorage.setItem("token", token);
         // Fetch user data immediately
         try {
-            const response = await fetch("http://localhost:8000/auth/me", {
+            console.log("Fetching profile with token:", token.substring(0, 10) + "...");
+            const response = await fetch("http://127.0.0.1:8000/auth/me", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
             if (response.ok) {
                 const userData = await response.json();
                 setUser(userData);
                 router.push("/dashboard");
+                return null; // Success
+            } else {
+                const status = response.status;
+                const text = await response.text();
+                console.error("Login fetch failed:", status, text);
+                return `Profile load failed: ${status} ${text}`;
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Login fetch failed", error);
+            return `Network error: ${error.message}`;
         }
     };
 
