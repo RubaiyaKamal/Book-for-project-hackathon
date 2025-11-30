@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const token = localStorage.getItem("token");
             if (token) {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/auth/me", {
+                    const response = await fetch("http://127.0.0.1:8001/auth/me", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Fetch user data immediately
         try {
             console.log("Fetching profile with token:", token.substring(0, 10) + "...");
-            const response = await fetch("http://127.0.0.1:8000/auth/me", {
+            const response = await fetch("http://127.0.0.1:8001/auth/me", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

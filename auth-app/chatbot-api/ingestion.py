@@ -2,31 +2,15 @@ import os
 import re
 from openai import OpenAI
 from qdrant_client import QdrantClient, models
+import httpx
 
 # Environment variables
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 QDRANT_URL = "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io"
 QDRANT_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo"
 
-# Initialize OpenAI client with proxy support
-http_client_args = {}
-http_proxy = os.getenv("HTTP_PROXY")
-https_proxy = os.getenv("HTTPS_PROXY")
-
-if http_proxy or https_proxy:
-    proxies = {}
-    if http_proxy:
-        proxies["http://"] = http_proxy
-    if https_proxy:
-        proxies["https://"] = https_proxy
-    http_client_args["proxies"] = proxies
-
-_http_client = None
-if http_client_args:
-    _http_client = httpx.Client(**http_client_args)
-    openai_client = OpenAI(api_key=OPENAI_API_KEY, http_client=_http_client)
-else:
-    openai_client = OpenAI(api_key=OPENAI_API_KEY)
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 if OPENAI_API_KEY == "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":
     print("WARNING: OPENAI_API_KEY in ingestion.py is still using the default placeholder. Please set your actual OpenAI API key as an environment variable or replace it in ingestion.py.")
@@ -134,4 +118,3 @@ if __name__ == "__main__":
     else:
         process_book_content_and_upload(docs_path)
 
-        

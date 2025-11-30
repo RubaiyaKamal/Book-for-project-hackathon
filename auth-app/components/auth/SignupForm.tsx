@@ -57,7 +57,7 @@ export default function SignupForm() {
                 interests: background.interests,
             };
 
-            const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+            const response = await fetch("http://127.0.0.1:8001/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export default function SignupForm() {
             console.log("Signup API success.");
 
             // Auto login after signup
-            const loginResponse = await fetch("http://127.0.0.1:8000/auth/login", {
+            const loginResponse = await fetch("http://127.0.0.1:8001/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
