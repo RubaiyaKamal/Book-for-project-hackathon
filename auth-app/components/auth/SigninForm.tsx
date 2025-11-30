@@ -26,18 +26,24 @@ export default function SigninForm() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
+            console.log("Signin API response status:", response.status);
 
             if (!response.ok) {
                 const data = await response.json();
+                console.error("Signin API error data:", data);
                 throw new Error(data.detail || "Signin failed");
             }
 
             const data = await response.json();
+            console.log("Signin API success data:", data);
             const errorMsg = await login(data.access_token);
             if (errorMsg) {
+                console.error("Auth provider login error:", errorMsg);
                 throw new Error(errorMsg);
             }
+            router.push("/book"); // Redirect to book page on successful login
         } catch (err: any) {
+            console.error("Signin process caught error:", err);
             setError(err.message || "Signin failed");
             setLoading(false);
         }
@@ -101,15 +107,12 @@ export default function SigninForm() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                     <button
-                        disabled
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50"
                     >
-                        Google
                     </button>
 
                     <button
-                        disabled
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50"
                     >
                         GitHub
                     </button>

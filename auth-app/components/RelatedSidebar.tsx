@@ -7,7 +7,7 @@ interface RelatedSidebarProps {
 
 export default function RelatedSidebar({ sections, currentSection }: RelatedSidebarProps) {
     const scrollToSection = (sectionName: string) => {
-        const element = document.getElementById(sectionName.toLowerCase().replace(/\s+/g, '-'));
+        const element = document.getElementById(sectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''));
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }

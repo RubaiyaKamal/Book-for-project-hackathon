@@ -24,6 +24,7 @@ export default function BookReaderPage() {
     const [personalizing, setPersonalizing] = useState(false);
     const [originalContent, setOriginalContent] = useState("");
 
+
     useEffect(() => {
         async function loadContent() {
             setLoading(true);
@@ -50,9 +51,19 @@ export default function BookReaderPage() {
             }
             setLoading(false);
         }
-
         loadContent();
     }, [activeId]);
+
+    useEffect(() => {
+        if (activeId) {
+            const element = document.getElementById(activeId);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [activeId]);
+
+
 
     const handleTextSelection = () => {
         const selection = window.getSelection();

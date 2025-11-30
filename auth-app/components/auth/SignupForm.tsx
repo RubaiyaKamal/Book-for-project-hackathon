@@ -43,6 +43,7 @@ export default function SignupForm() {
     };
 
     const handleFinalSubmit = async (e: React.FormEvent) => {
+        console.log("handleFinalSubmit triggered");
         e.preventDefault();
         setLoading(true);
         setError("");
@@ -61,11 +62,14 @@ export default function SignupForm() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
+            console.log("Signup API response status:", response.status);
 
             if (!response.ok) {
                 const data = await response.json();
+                console.error("Signup API error data:", data);
                 throw new Error(data.detail || "Signup failed");
             }
+            console.log("Signup API success.");
 
             // Auto login after signup
             const loginResponse = await fetch("http://127.0.0.1:8000/auth/login", {
@@ -76,15 +80,20 @@ export default function SignupForm() {
                     password: formData.password,
                 }),
             });
+            console.log("Auto-login API response status:", loginResponse.status);
 
             if (loginResponse.ok) {
                 const loginData = await loginResponse.json();
+                console.log("Auto-login API success data:", loginData);
                 const errorMsg = await login(loginData.access_token);
                 if (errorMsg) {
                     console.error("Auto-login failed:", errorMsg);
                     router.push("/signin");
+                } else {
+                    router.push("/book"); // Redirect to book page on successful auto-login
                 }
             } else {
+                console.error("Auto-login API failed.");
                 router.push("/signin");
             }
         } catch (err: any) {

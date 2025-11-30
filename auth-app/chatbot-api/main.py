@@ -1,13 +1,14 @@
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
-import os
+import httpx
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
 # Environment variables
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 QDRANT_URL = os.getenv("QDRANT_URL", "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo")
 
@@ -18,7 +19,29 @@ qdrant_client = None
 def get_openai_client():
     global openai_client
     if openai_client is None:
-        openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        http_client_args = {}
+        # Check for proxy environment variables
+        http_proxy = os.getenv("HTTP_PROXY")
+        https_proxy = os.getenv("HTTPS_PROXY")
+
+        if http_proxy or https_proxy:
+            # httpx expects proxies in a dictionary format
+            proxies = {}
+            if http_proxy:
+                proxies["http://"] = http_proxy
+            if https_proxy:
+                proxies["https://"] = https_proxy
+            http_client_args["proxies"] = proxies
+
+        if OPENAI_API_KEY == "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":
+            print("WARNING: OPENAI_API_KEY is still using the default placeholder. Please set your actual OpenAI API key as an environment variable or replace it in main.py.")
+
+        _http_client = None
+        if http_client_args:
+            _http_client = httpx.Client(**http_client_args)
+            openai_client = OpenAI(api_key=OPENAI_API_KEY, http_client=_http_client)
+        else:
+            openai_client = OpenAI(api_key=OPENAI_API_KEY)
     return openai_client
 
 def get_qdrant_client():
@@ -63,11 +86,13 @@ class ChatResponse(BaseModel):
 # Helper functions
 def get_embedding(text: str) -> List[float]:
     """Generate embedding for a text using OpenAI"""
+    print(f"--- Chatbot: Generating embedding for text (length: {len(text)}) ---")
     client = get_openai_client()
     response = client.embeddings.create(
         input=text,
         model=EMBEDDING_MODEL
     )
+    print("--- Chatbot: Embedding generated successfully ---")
     return response.data[0].embedding
 
 def search_similar_chunks(query: str, top_k: int = 5) -> List[dict]:
@@ -92,6 +117,7 @@ def search_similar_chunks(query: str, top_k: int = 5) -> List[dict]:
 
 def generate_answer(question: str, context: str, selected_text: Optional[str] = None) -> str:
     """Generate answer using OpenAI chat completion"""
+    print(f"--- Chatbot: Calling OpenAI chat completion for question: {question[:50]}... ---")
 
     if selected_text:
         system_prompt = f"""You are a helpful assistant answering questions about a book on Physical AI & Humanoid Robotics.
@@ -121,7 +147,7 @@ Please provide a clear, concise answer based on the context above."""
         temperature=0.7,
         max_tokens=500
     )
-
+    print("--- Chatbot: Received response from OpenAI chat completion ---")
     return response.choices[0].message.content
 
 # API Endpoints
@@ -138,6 +164,7 @@ async def chat(request: ChatRequest):
     """
     try:
         if request.selected_text:
+            print("--- Chatbot: Using selected text for answer generation ---")
             # Answer based on selected text only
             answer = generate_answer(
                 question=request.question,
@@ -146,21 +173,25 @@ async def chat(request: ChatRequest):
             )
             sources = ["Selected Text"]
         else:
+            print(f"--- Chatbot: Searching Qdrant for question: {request.question} ---")
             # Search vector database for relevant chunks
             similar_chunks = search_similar_chunks(request.question, top_k=5)
 
             if not similar_chunks:
+                print("--- Chatbot: No relevant content found in Qdrant ---")
                 raise HTTPException(status_code=404, detail="No relevant content found")
 
             # Combine chunks for context
             context = "\n\n".join([chunk["content"] for chunk in similar_chunks])
             sources = list(set([chunk["source"] for chunk in similar_chunks]))
+            print(f"--- Chatbot: Found {len(similar_chunks)} chunks from Qdrant. Context length: {len(context)} ---")
 
             # Generate answer
             answer = generate_answer(
                 question=request.question,
                 context=context
             )
+            print(f"--- Chatbot: Generated answer. Length: {len(answer)} ---")
 
         return ChatResponse(answer=answer, sources=sources)
 
