@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv # Import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -7,10 +11,10 @@ import httpx
 from openai import OpenAI
 from qdrant_client import QdrantClient
 
-# Environment variables
-OPENAI_API_KEY="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"
-QDRANT_URL = os.getenv("QDRANT_URL", "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo")
+# Environment variables - Read them directly from os.getenv()
+# These will be initialized once per worker process when the app starts
+# and read from the environment or .env file by the uvicorn worker.
+# Do not define them globally and then override with os.getenv() later.
 
 # Initialize clients lazily to prevent startup errors
 openai_client = None
@@ -19,35 +23,35 @@ qdrant_client = None
 def get_openai_client():
     global openai_client
     if openai_client is None:
-        http_client_args = {}
-        # Check for proxy environment variables
-        http_proxy = os.getenv("HTTP_PROXY")
-        https_proxy = os.getenv("HTTPS_PROXY")
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            print("ERROR: OPENAI_API_KEY environment variable is not set.")
+            raise ValueError("OPENAI_API_KEY environment variable is not set.")
 
-        if http_proxy or https_proxy:
-            # httpx expects proxies in a dictionary format
-            proxies = {}
-            if http_proxy:
-                proxies["http://"] = http_proxy
-            if https_proxy:
-                proxies["https://"] = https_proxy
-            http_client_args["proxies"] = proxies
+        # Check for the default placeholder that might still be in the code or environment
+        if api_key == "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":
+             print("WARNING: OPENAI_API_KEY is still using the default placeholder. Please set your actual OpenAI API key as an environment variable.")
 
-        if OPENAI_API_KEY == "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":
-            print("WARNING: OPENAI_API_KEY is still using the default placeholder. Please set your actual OpenAI API key as an environment variable or replace it in main.py.")
-
-        _http_client = None
-        if http_client_args:
-            _http_client = httpx.Client(**http_client_args)
-            openai_client = OpenAI(api_key=OPENAI_API_KEY, http_client=_http_client)
-        else:
-            openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        # Initialize OpenAI client
+        # Note: Proxies should be set via HTTP_PROXY and HTTPS_PROXY environment variables
+        # which will be automatically picked up by httpx
+        openai_client = OpenAI(api_key=api_key)
     return openai_client
 
 def get_qdrant_client():
     global qdrant_client
     if qdrant_client is None:
-        qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+        qdrant_url = os.getenv("QDRANT_URL", "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io")
+        qdrant_api_key = os.getenv("QDRANT_API_KEY", "your_qdrant_api_key_here") # Replaced the hardcoded key with a placeholder for best practice
+
+        if not qdrant_url:
+            print("ERROR: QDRANT_URL environment variable is not set.")
+            raise ValueError("QDRANT_URL environment variable is not set.")
+        if not qdrant_api_key:
+            print("ERROR: QDRANT_API_KEY environment variable is not set.")
+            raise ValueError("QDRANT_API_KEY environment variable is not set.")
+
+        qdrant_client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
     return qdrant_client
 
 COLLECTION_NAME = "book_chunks"
@@ -179,7 +183,10 @@ async def chat(request: ChatRequest):
 
             if not similar_chunks:
                 print("--- Chatbot: No relevant content found in Qdrant ---")
-                raise HTTPException(status_code=404, detail="No relevant content found")
+                # This could mean Qdrant is empty or no relevant embeddings
+                # Consider raising HTTPException here if a response is always expected
+                raise HTTPException(status_code=404, detail="No relevant content found in Qdrant. Please ensure data is ingested.")
+
 
             # Combine chunks for context
             context = "\n\n".join([chunk["content"] for chunk in similar_chunks])
@@ -195,6 +202,9 @@ async def chat(request: ChatRequest):
 
         return ChatResponse(answer=answer, sources=sources)
 
+    except HTTPException:
+        # Re-raise HTTPExceptions to be handled by FastAPI
+        raise
     except Exception as e:
         print(f"Chat error: {str(e)}")
         import traceback
@@ -204,17 +214,29 @@ async def chat(request: ChatRequest):
 @app.get("/health")
 async def health_check():
     """Check if all services are connected"""
+    qdrant_status = "disconnected"
     try:
-        # Check Qdrant connection
-        collections = qdrant_client.get_collections()
+        client = get_qdrant_client()
+        collections = client.get_collections()
         qdrant_status = "connected"
     except Exception as e:
         qdrant_status = f"error: {str(e)}"
 
+    openai_status = "disconnected"
+    try:
+        client = get_openai_client()
+        # Attempt a small API call to check connectivity
+        # This can be changed to a simpler health check if available
+        client.models.list()
+        openai_status = "connected"
+    except Exception as e:
+        openai_status = f"error: {str(e)}"
+
+
     return {
         "status": "healthy",
         "qdrant": qdrant_status,
-        "openai": "configured"
+        "openai": openai_status
     }
 
 if __name__ == "__main__":
