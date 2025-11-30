@@ -92,7 +92,8 @@ async function generatePersonalizedContent(
     });
 
     if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
+        const errorDetails = await response.text();
+        throw new Error(`OpenAI API error: ${response.statusText}. Details: ${errorDetails}`);
     }
 
     const data = await response.json();

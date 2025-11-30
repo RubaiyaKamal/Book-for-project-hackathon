@@ -109,6 +109,7 @@ export default function SigninForm() {
                     <button
                         className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50"
                     >
+                        Google
                     </button>
 
                     <button

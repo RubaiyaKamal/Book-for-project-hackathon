@@ -184,3 +184,27 @@
     width: 100%;
   }
 }
+
+.button-group {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px;
+}
+
+.translate-button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.translate-button:hover {
+    background-color: #45a049;
+}

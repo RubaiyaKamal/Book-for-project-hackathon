@@ -8,7 +8,7 @@ from openai import OpenAI
 from qdrant_client import QdrantClient
 
 # Environment variables
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+OPENAI_API_KEY="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"
 QDRANT_URL = os.getenv("QDRANT_URL", "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo")
 
@@ -219,4 +219,7 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+
+
