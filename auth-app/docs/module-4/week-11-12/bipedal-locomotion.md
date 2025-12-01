@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 2
-title: "Chapter 2: Bipedal Locomotion and Balance Control"
-description: "Walking, running, and maintaining balance for humanoid robots"
----
+﻿
 
 # Chapter 2: Bipedal Locomotion and Balance Control
 

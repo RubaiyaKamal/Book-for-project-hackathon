@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 3
-title: "Chapter 3: Multi-modal Interaction: Speech, Gesture, Vision"
-description: "Creating rich, human-like interactions by combining multiple sensory inputs"
----
+﻿
 
 # Chapter 3: Multi-modal Interaction: Speech, Gesture, Vision
 

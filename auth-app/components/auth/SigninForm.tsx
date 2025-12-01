@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SigninForm() {
     const router = useRouter();
-    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [formData, setFormData] = useState({
@@ -21,30 +20,39 @@ export default function SigninForm() {
         setError("");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+            const { data, error: authError } = await authClient.signIn.email({
+                email: formData.email,
+                password: formData.password,
             });
-            console.log("Signin API response status:", response.status);
 
-            if (!response.ok) {
-                const data = await response.json();
-                console.error("Signin API error data:", data);
-                throw new Error(data.detail || "Signin failed");
+            if (authError) {
+                throw new Error(authError.message || "Signin failed");
             }
 
-            const data = await response.json();
-            console.log("Signin API success data:", data);
-            const errorMsg = await login(data.access_token);
-            if (errorMsg) {
-                console.error("Auth provider login error:", errorMsg);
-                throw new Error(errorMsg);
-            }
-            router.push("/book"); // Redirect to book page on successful login
+            // Redirect to book page on successful login
+            router.push("/book");
+            router.refresh(); // Refresh to update session state
         } catch (err: any) {
-            console.error("Signin process caught error:", err);
-            setError(err.message || "Signin failed");
+            console.error("Signin error:", err);
+            setError(err.message || "Signin failed. Please check your credentials.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSocialLogin = async (provider: "google" | "github") => {
+        console.log(`Attempting ${provider} login from SigninForm`);
+        setLoading(true);
+        setError("");
+        try {
+            const result = await authClient.signIn.social({
+                provider,
+                callbackURL: "/book",
+            });
+            console.log(`${provider} login initiated`, result);
+        } catch (err: any) {
+            console.error(`${provider} login error details:`, err);
+            setError(err.message || `Failed to login with ${provider}`);
             setLoading(false);
         }
     };
@@ -107,13 +115,19 @@ export default function SigninForm() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                     <button
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50"
+                        type="button"
+                        onClick={() => handleSocialLogin("google")}
+                        disabled={loading}
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50 disabled:opacity-50"
                     >
                         Google
                     </button>
 
                     <button
-                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50"
+                        type="button"
+                        onClick={() => handleSocialLogin("github")}
+                        disabled={loading}
+                        className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50 disabled:opacity-50"
                     >
                         GitHub
                     </button>

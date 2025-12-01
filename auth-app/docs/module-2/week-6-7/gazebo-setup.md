@@ -1,8 +1,3 @@
----
-sidebar_position: 1
-title: "Chapter 1: Gazebo Simulation Environment"
-description: "Setting up and mastering Gazebo for robot simulation"
----
 
 # Chapter 1: Gazebo Simulation Environment
 

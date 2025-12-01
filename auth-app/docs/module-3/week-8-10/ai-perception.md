@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 2
-title: "Chapter 2: AI-Powered Perception and Manipulation"
-description: "Deep learning for robot vision and intelligent manipulation using Isaac Sim"
----
+﻿
 
 # Chapter 2: AI-Powered Perception and Manipulation
 

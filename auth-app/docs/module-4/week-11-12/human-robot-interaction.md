@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 4
-title: "Chapter 4: Natural Human-Robot Interaction Design"
-description: "Creating intuitive and safe interactions between humans and humanoid robots"
----
+﻿
 
 # Chapter 4: Natural Human-Robot Interaction Design
 

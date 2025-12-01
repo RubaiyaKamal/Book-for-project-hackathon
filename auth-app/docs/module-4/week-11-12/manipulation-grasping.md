@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 3
-title: "Chapter 3: Manipulation and Grasping with Humanoid Hands"
-description: "Dexterous manipulation using multi-fingered humanoid hands"
----
+﻿
 
 # Chapter 3: Manipulation and Grasping with Humanoid Hands
 

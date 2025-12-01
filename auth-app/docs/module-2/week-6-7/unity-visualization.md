@@ -1,8 +1,3 @@
----
-sidebar_position: 4
-title: "Chapter 4: Unity for Robot Visualization"
-description: "Using Unity for stunning 3D visualization and alternative simulation"
----
 
 # Chapter 4: Unity for Robot Visualization
 

@@ -1,8 +1,3 @@
----
-sidebar_position: 1
-title: "Assessments"
-description: "Course projects and grading criteria"
----
 
 # Assessments
 

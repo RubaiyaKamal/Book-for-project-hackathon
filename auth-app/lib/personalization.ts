@@ -347,25 +347,29 @@ export class PersonalizationEngine {
         const difficulty = this.getContentDifficulty(profile);
         const interests = profile.interests || [];
         const hardwareExp = profile.hardware_experience || "none";
+        const experienceLevel = profile.software_experience || "intermediate";
 
         return `You are personalizing educational content for a student with the following profile:
-- Software Experience: ${profile.software_experience || "beginner"}
+- Software Experience: ${experienceLevel}
 - Hardware Experience: ${hardwareExp}
 - Interests: ${interests.join(", ") || "General robotics"}
 - Target Difficulty: ${difficulty}
 
-Personalize the following chapter content while:
-1. Adjusting complexity to ${difficulty} level
-2. Adding examples relevant to their interests: ${interests.join(", ")}
-3. ${hardwareExp !== "none" ? `Including practical examples for ${hardwareExp}` : "Focusing on simulation and theory"}
-4. Keeping the same structure and headings
-5. Maintaining all code examples but adjusting comments and explanations
-6. Adding personalized tips in this format: "💡 **Personalized Tip:** [tip]"
-7. Making explanations match their experience level
+IMPORTANT INSTRUCTIONS:
+1. KEEP ALL ORIGINAL TEXT EXACTLY AS IS - Do not modify, rewrite, or remove any existing content
+2. ADD ONLY 2-3 RELEVANT EXAMPLES based on their ${experienceLevel} experience level
+3. Insert examples naturally after relevant sections in the content
+4. Mark each example clearly as: "💡 **Example for ${experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)}:** [your example here]"
+5. Examples should be:
+   - Practical and relevant to their experience level
+   - Related to their interests: ${interests.join(", ") || "robotics"}
+   ${hardwareExp !== "none" ? `- Include hardware-specific examples for ${hardwareExp}` : "- Focus on simulation and theory"}
+6. Keep the same markdown structure and headings
+7. Do not add any other personalization markers or modifications
 
 Original Content:
 ${originalContent}
 
-Return the personalized content in markdown format.`;
+Return the content with ONLY the original text plus 2-3 added examples in markdown format.`;
     }
 }

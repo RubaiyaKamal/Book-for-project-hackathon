@@ -1,9 +1,4 @@
-﻿---
-sidebar_position: 3
-title: "Chapter 3: Reinforcement Learning for Robot Control"
-description: "Training robots through trial and error using RL in Isaac Sim"
----
-
+﻿
 # Chapter 3: Reinforcement Learning for Robot Control
 
 ## Overview

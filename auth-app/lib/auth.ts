@@ -5,8 +5,22 @@ const pool = new Pool({
     connectionString: process.env.NEON_DATABASE_URL,
 });
 
+// Debug logging to verify environment variables
+console.log("--- Auth Configuration Check ---");
+console.log("BETTER_AUTH_URL:", process.env.BETTER_AUTH_URL);
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
+console.log("GITHUB_CLIENT_ID:", process.env.GITHUB_CLIENT_ID ? "Set" : "Missing");
+
 export const auth = betterAuth({
     database: pool,
+    baseURL: process.env.BETTER_AUTH_URL, // Explicitly set base URL
+    trustedOrigins: [
+        "http://localhost:3000",
+        "http://localhost:3001", // In case you run on different port
+        "http://localhost:3002", // Current running port
+        process.env.BETTER_AUTH_URL || "",
+        process.env.NEXT_PUBLIC_APP_URL || "",
+    ].filter(Boolean), // Remove empty strings
     emailAndPassword: {
         enabled: true,
     },

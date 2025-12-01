@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 4
-title: "Chapter 4: Launch Files and Parameter Management"
-description: "Master ROS 2 launch systems for orchestrating complex multi-node applications"
----
+﻿
 
 # Chapter 4: Launch Files and Parameter Management
 

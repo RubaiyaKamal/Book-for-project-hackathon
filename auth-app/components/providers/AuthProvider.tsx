@@ -1,103 +1,61 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface User {
     email: string;
-    id: number;
-    profile?: {
-        software_experience: string;
-        hardware_experience: string;
-        interests: string[];
-    };
+    id: string;
+    name?: string;
+    image?: string | null;
 }
 
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     loading: boolean;
-    login: (token: string) => Promise<string | null>;
-    logout: () => void;
+    login: () => void; // No-op for Better Auth as it handles its own state
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
     loading: true,
-    login: async () => "Not implemented",
-    logout: () => { },
+    login: () => { },
+    logout: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { data: session, isPending, error } = authClient.useSession();
     const router = useRouter();
 
-    useEffect(() => {
-        const initAuth = async () => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                try {
-                    const response = await fetch("http://127.0.0.1:8001/auth/me", {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    if (response.ok) {
-                        const userData = await response.json();
-                        setUser(userData);
-                    } else {
-                        localStorage.removeItem("token");
-                    }
-                } catch (error) {
-                    console.error("Auth check failed", error);
-                }
-            }
-            setLoading(false);
-        };
-
-        initAuth();
-    }, []);
-
-    const login = async (token: string): Promise<string | null> => {
-        localStorage.setItem("token", token);
-        // Fetch user data immediately
-        try {
-            console.log("Fetching profile with token:", token.substring(0, 10) + "...");
-            const response = await fetch("http://127.0.0.1:8001/auth/me", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (response.ok) {
-                const userData = await response.json();
-                setUser(userData);
-                router.push("/dashboard");
-                return null; // Success
-            } else {
-                const status = response.status;
-                const text = await response.text();
-                console.error("Login fetch failed:", status, text);
-                return `Profile load failed: ${status} ${text}`;
-            }
-        } catch (error: any) {
-            console.error("Login fetch failed", error);
-            return `Network error: ${error.message}`;
-        }
-    };
-
-    const logout = () => {
-        localStorage.removeItem("token");
-        setUser(null);
+    const login = () => {
+        // Better Auth handles login via its own client methods
         router.push("/signin");
     };
 
+    const logout = async () => {
+        await authClient.signOut();
+        router.push("/signin");
+    };
+
+    const user = session?.user ? {
+        ...session.user,
+        id: session.user.id
+    } : null;
+
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout }}>
+        <AuthContext.Provider value={{
+            user,
+            isAuthenticated: !!user,
+            loading: isPending,
+            login,
+            logout
+        }}>
             {children}
         </AuthContext.Provider>
     );

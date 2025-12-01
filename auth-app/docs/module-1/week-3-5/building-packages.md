@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 3
-title: "Chapter 3: Building ROS 2 Packages with Python"
-description: "Complete guide to creating, structuring, and managing ROS 2 Python packages"
----
+﻿
 
 # Chapter 3: Building ROS 2 Packages with Python
 

@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 1
-title: "Chapter 1: Humanoid Robot Kinematics and Dynamics"
-description: "Mathematical foundations for humanoid robot motion and control"
----
+﻿
 
 # Chapter 1: Humanoid Robot Kinematics and Dynamics
 

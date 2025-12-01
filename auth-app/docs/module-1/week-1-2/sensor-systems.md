@@ -1,8 +1,3 @@
----
-sidebar_position: 4
-title: "Chapter 4: Sensor Systems for Humanoid Robots"
-description: "Deep dive into perception hardware - LiDAR, cameras, IMUs, and force sensors"
----
 
 # Chapter 4: Sensor Systems for Humanoid Robots
 

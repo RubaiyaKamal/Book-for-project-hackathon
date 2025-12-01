@@ -1,9 +1,4 @@
-﻿---
-sidebar_position: 1
-title: "Chapter 1: NVIDIA Isaac SDK and Isaac Sim"
-description: "Introduction to NVIDIA's robotics platform for AI-powered robot development"
----
-
+﻿
 # Chapter 1: NVIDIA Isaac SDK and Isaac Sim
 
 ## Overview

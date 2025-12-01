@@ -1,8 +1,3 @@
----
-sidebar_position: 2
-title: "Chapter 2: URDF and SDF Robot Description"
-description: "Master robot description formats for simulation and visualization"
----
 
 # Chapter 2: URDF and SDF Robot Description
 

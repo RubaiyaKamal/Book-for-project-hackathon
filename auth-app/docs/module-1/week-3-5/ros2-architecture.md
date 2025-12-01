@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 1
----
-
-# ROS 2 Architecture
+﻿
 
 ## Introduction to ROS 2
 

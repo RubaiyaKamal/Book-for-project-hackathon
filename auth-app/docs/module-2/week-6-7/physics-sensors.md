@@ -1,8 +1,4 @@
----
-sidebar_position: 3
-title: "Chapter 3: Physics and Sensor Simulation"
-description: "Realistic physics simulation and sensor modeling in Gazebo"
----
+
 
 # Chapter 3: Physics and Sensor Simulation
 

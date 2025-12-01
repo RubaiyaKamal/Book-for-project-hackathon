@@ -1,8 +1,4 @@
----
-sidebar_position: 1
-title: "Chapter 1: Introduction to Physical AI"
-description: "Understanding the convergence of artificial intelligence and physical embodiment in robotics"
----
+
 
 # Chapter 1: Introduction to Physical AI
 

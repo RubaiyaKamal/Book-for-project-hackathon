@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface SignupFormData {
@@ -18,7 +18,6 @@ interface BackgroundData {
 
 export default function SignupForm() {
     const router = useRouter();
-    const { login } = useAuth();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -43,61 +42,83 @@ export default function SignupForm() {
     };
 
     const handleFinalSubmit = async (e: React.FormEvent) => {
-        console.log("handleFinalSubmit triggered");
         e.preventDefault();
         setLoading(true);
         setError("");
 
         try {
-            const payload = {
+            console.log("=== Starting Signup Process ===");
+            console.log("Form data:", { email: formData.email, name: formData.name });
+
+            // Step 1: Sign up with Better Auth
+            console.log("Step 1: Attempting signup...");
+            const { data, error: signupError } = await authClient.signUp.email({
                 email: formData.email,
                 password: formData.password,
-                software_experience: background.software_experience,
-                hardware_experience: background.hardware_experience,
-                interests: background.interests,
-            };
-
-            const response = await fetch("http://127.0.0.1:8000/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                name: formData.name,
+                callbackURL: "/book",
             });
-            console.log("Signup API response status:", response.status);
 
-            if (!response.ok) {
-                const data = await response.json();
-                console.error("Signup API error data:", data);
-                throw new Error(data.detail || "Signup failed");
+            console.log("Signup response:", { data, error: signupError });
+
+            if (signupError) {
+                console.error("Signup error details:", signupError);
+                throw new Error(signupError.message || "Signup failed");
             }
-            console.log("Signup API success.");
 
-            // Auto login after signup
-            const loginResponse = await fetch("http://127.0.0.1:8000/auth/login", {
+            console.log("✓ Signup successful!");
+
+            // Step 2: Sign in automatically to establish session
+            console.log("Step 2: Attempting auto sign-in...");
+            const { error: signinError } = await authClient.signIn.email({
+                email: formData.email,
+                password: formData.password,
+            });
+
+            if (signinError) {
+                console.error("Auto sign-in error:", signinError);
+                // Signup succeeded but auto-login failed, redirect to signin
+                setError("Account created! Please sign in manually.");
+                router.push("/signin");
+                return;
+            }
+
+            console.log("✓ Auto sign-in successful!");
+
+            // Step 3: Store user profile/background data
+            console.log("Step 3: Saving user profile...");
+            const profileResponse = await fetch("/api/user-profile", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
+                    software_experience: background.software_experience,
+                    hardware_experience: background.hardware_experience,
+                    interests: background.interests,
                 }),
             });
-            console.log("Auto-login API response status:", loginResponse.status);
 
-            if (loginResponse.ok) {
-                const loginData = await loginResponse.json();
-                console.log("Auto-login API success data:", loginData);
-                const errorMsg = await login(loginData.access_token);
-                if (errorMsg) {
-                    console.error("Auto-login failed:", errorMsg);
-                    router.push("/signin");
-                } else {
-                    router.push("/book"); // Redirect to book page on successful auto-login
-                }
+            console.log("Profile response status:", profileResponse.status);
+
+            if (!profileResponse.ok) {
+                const errorData = await profileResponse.json();
+                console.error("Failed to save user profile:", errorData);
+                // Don't fail the whole signup if profile save fails
             } else {
-                console.error("Auto-login API failed.");
-                router.push("/signin");
+                console.log("✓ Profile saved successfully!");
             }
+
+            // Success! Redirect to book page
+            console.log("=== Signup Complete! Redirecting to /book ===");
+            router.push("/book");
+            router.refresh();
         } catch (err: any) {
-            setError(err.message || "Signup failed");
+            console.error("=== Signup Failed ===");
+            console.error("Error object:", err);
+            console.error("Error message:", err.message);
+            console.error("Error stack:", err.stack);
+            setError(err.message || "Signup failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -114,6 +135,21 @@ export default function SignupForm() {
                 ...background,
                 interests: [...background.interests, interest],
             });
+        }
+    };
+
+    const handleSocialLogin = async (provider: "google" | "github") => {
+        setLoading(true);
+        setError("");
+        try {
+            await authClient.signIn.social({
+                provider,
+                callbackURL: "/book", // Redirect to book page after login
+            });
+        } catch (err: any) {
+            console.error(`${provider} login error:`, err);
+            setError(`Failed to login with ${provider}`);
+            setLoading(false);
         }
     };
 
@@ -170,6 +206,39 @@ export default function SignupForm() {
                         Continue
                     </button>
                 </form>
+
+                <div className="mt-6">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300 dark:border-dark-brown/30"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-cream dark:bg-dark-brown text-gray-600 dark:text-cream/70">
+                                Or continue with
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => handleSocialLogin("google")}
+                            disabled={loading}
+                            className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50 disabled:opacity-50"
+                        >
+                            Google
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handleSocialLogin("github")}
+                            disabled={loading}
+                            className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-brown/30 rounded-lg bg-gray-100 dark:bg-dark-brown/30 text-dark-brown dark:text-cream hover:bg-gray-200 dark:hover:bg-dark-brown/50 disabled:opacity-50"
+                        >
+                            GitHub
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }

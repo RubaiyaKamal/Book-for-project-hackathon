@@ -1,8 +1,3 @@
----
-sidebar_position: 2
-title: "Hardware Requirements"
-description: "Workstations, Edge Kits, and Robot Lab Setup"
----
 
 # Hardware Requirements
 

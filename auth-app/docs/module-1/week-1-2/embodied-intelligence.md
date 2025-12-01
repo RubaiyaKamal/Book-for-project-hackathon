@@ -1,8 +1,6 @@
----
-sidebar_position: 2
----
-
 # Embodied Intelligence
+
+
 
 ## What is Embodied Intelligence?
 

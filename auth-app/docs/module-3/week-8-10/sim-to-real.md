@@ -1,9 +1,4 @@
-﻿---
-sidebar_position: 4
-title: "Chapter 4: Sim-to-Real Transfer Techniques"
-description: "Bridging the gap between simulation and real-world robot deployment"
----
-
+﻿
 # Chapter 4: Sim-to-Real Transfer Techniques
 
 ## Overview

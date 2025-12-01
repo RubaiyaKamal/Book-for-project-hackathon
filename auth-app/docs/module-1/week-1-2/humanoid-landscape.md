@@ -1,9 +1,3 @@
----
-sidebar_position: 3
-title: "Chapter 3: The Humanoid Robot Landscape"
-description: "Survey of current humanoid robots, platforms, and industry trends"
----
-
 # Chapter 3: The Humanoid Robot Landscape
 
 ## Overview

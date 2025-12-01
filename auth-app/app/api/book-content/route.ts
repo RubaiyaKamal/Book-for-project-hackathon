@@ -1,6 +1,47 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NextResponse } from 'next/server';
+import { marked } from 'marked';
+
+// Configure marked with custom renderer for proper styling
+const renderer = new marked.Renderer();
+
+// Custom heading renderer to add IDs and classes
+renderer.heading = ({ text, depth }) => {
+    const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+
+    const classes = {
+        1: 'text-4xl font-bold text-dark-brown dark:text-cream mb-6 mt-8',
+        2: 'text-3xl font-semibold text-dark-brown dark:text-cream mb-4 mt-6 border-b-2 border-goldenrod/30 pb-2',
+        3: 'text-2xl font-semibold text-dark-brown dark:text-cream mb-3 mt-4',
+        4: 'text-xl font-semibold text-goldenrod dark:text-goldenrod mb-2 mt-3',
+        5: 'text-lg font-semibold text-dark-brown dark:text-cream mb-2 mt-2',
+        6: 'text-base font-semibold text-dark-brown dark:text-cream mb-2 mt-2'
+    };
+
+    return `<h${depth} id="${id}" class="${classes[depth as keyof typeof classes]}">${text}</h${depth}>`;
+};
+
+// Custom strong renderer for goldenrod color
+renderer.strong = ({ text }) => {
+    return `<strong class="text-goldenrod font-semibold">${text}</strong>`;
+};
+
+// Custom code renderer for inline code
+renderer.codespan = ({ text }) => {
+    return `<code class="bg-cream dark:bg-dark-brown/50 px-2 py-1 rounded text-sm font-mono text-mint">${text}</code>`;
+};
+
+// Custom link renderer
+renderer.link = ({ href, text }) => {
+    return `<a href="${href}" class="text-goldenrod hover:text-goldenrod/80 underline">${text}</a>`;
+};
+
+marked.setOptions({
+    gfm: true,
+    breaks: true,
+    renderer: renderer
+});
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -55,15 +96,32 @@ export async function GET(request: Request) {
         const sections: string[] = [];
 
         for (const line of lines) {
-            if (line.startsWith('title:')) {
-                title = line.replace('title:', '').trim().replace(/['"]/g, '');
+            const trimmedLine = line.trim();
+
+            if (trimmedLine.startsWith('title:')) {
+                title = trimmedLine.replace('title:', '').trim().replace(/['"]/g, '');
             }
-            if (line.match(/^##\s+/)) {
-                sections.push(line.replace(/^##\s+/, '').trim());
+
+            // Fallback: Extract H1 as title if we haven't found a frontmatter title
+            // (and the line looks like a title, not just a random #)
+            if (title === id && trimmedLine.match(/^#\s+(.+)$/)) {
+                const h1Match = trimmedLine.match(/^#\s+(.+)$/);
+                if (h1Match) {
+                    title = h1Match[1].trim();
+                }
+            }
+
+            // Match H2 headers more robustly (trim first to handle CRLF)
+            const h2Match = trimmedLine.match(/^##\s+(.+)$/);
+            if (h2Match) {
+                sections.push(h2Match[1].trim());
             }
         }
 
-        return NextResponse.json({ title, content, sections });
+        // Convert markdown to HTML on server
+        const htmlContent = await marked(content);
+
+        return NextResponse.json({ title, content: htmlContent, sections });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to read file' }, { status: 500 });
     }

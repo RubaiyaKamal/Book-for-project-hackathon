@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 2
-title: "Chapter 2: Speech Recognition and Natural Language Understanding"
-description: "Giving robots the ability to hear, transcribe, and understand spoken language"
----
+﻿
 
 # Chapter 2: Speech Recognition and Natural Language Understanding
 

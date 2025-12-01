@@ -1,8 +1,4 @@
-﻿---
-sidebar_position: 1
-title: "Chapter 1: Integrating GPT Models for Conversational AI"
-description: "Empowering robots with Large Language Models for natural conversation and reasoning"
----
+﻿
 
 # Chapter 1: Integrating GPT Models for Conversational AI
 

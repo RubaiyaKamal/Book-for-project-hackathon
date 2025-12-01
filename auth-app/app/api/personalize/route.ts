@@ -1,35 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PersonalizationEngine } from "@/lib/personalization";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { profileStore } from "@/lib/profile-store";
 
 export async function POST(req: NextRequest) {
     try {
-        // Get JWT token from Authorization header
-        const authHeader = req.headers.get("authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const token = authHeader.substring(7);
-
-        // Fetch user profile from FastAPI
-        const userResponse = await fetch("http://127.0.0.1:8000/auth/me", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        // Get session from Better Auth
+        const session = await auth.api.getSession({
+            headers: await headers()
         });
 
-        if (!userResponse.ok) {
+        if (!session) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await userResponse.json();
-        const profile = user.profile;
+        // Fetch user profile from profile store
+        let simpleProfile = await profileStore.get(session.user.id);
 
-        if (!profile) {
-            return NextResponse.json(
-                { error: "Profile not found. Please complete onboarding." },
-                { status: 404 }
-            );
+        // If profile doesn't exist, create a default one
+        if (!simpleProfile) {
+            console.log("Profile not found for user:", session.user.id, "- creating default profile");
+            const defaultProfile = {
+                software_experience: "intermediate",
+                hardware_experience: "arduino",
+                interests: []
+            };
+            simpleProfile = await profileStore.set(session.user.id, defaultProfile);
         }
 
         const { chapterId, originalContent } = await req.json();
@@ -41,19 +38,36 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Convert simple profile to full profile for PersonalizationEngine
+        // Map the simple profile fields to the expected complex profile structure
+        const fullProfile = {
+            programming_experience: simpleProfile.software_experience || "intermediate",
+            known_languages: ["python"], // Default
+            ml_experience: "basic", // Default
+            ros_experience: "none", // Default
+            robotics_experience: simpleProfile.hardware_experience === "none" ? "none" : "hobbyist",
+            electronics_knowledge: simpleProfile.hardware_experience || "basic",
+            has_robot_hardware: simpleProfile.hardware_experience !== "none",
+            hardware_platforms: simpleProfile.hardware_experience !== "none" ? [simpleProfile.hardware_experience] : [],
+            learning_style: "mixed", // Default
+            preferred_pace: "normal", // Default
+            goals: simpleProfile.interests || []
+        };
+
         // Generate personalized content using OpenAI
         const personalizedContent = await generatePersonalizedContent(
             originalContent,
-            profile
+            simpleProfile // Use simple profile for the prompt
         );
 
         return NextResponse.json({
             success: true,
             personalizedContent,
+            experienceLevel: simpleProfile.software_experience, // Return experience level for UI badge
             profile: {
-                difficulty: PersonalizationEngine.getContentDifficulty(profile),
-                interests: profile.interests || [],
-                hardwareExperience: profile.hardware_experience,
+                difficulty: PersonalizationEngine.getContentDifficulty(fullProfile),
+                interests: simpleProfile.interests || [],
+                hardwareExperience: simpleProfile.hardware_experience,
             },
         });
     } catch (error) {
