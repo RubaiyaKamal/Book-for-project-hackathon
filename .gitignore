@@ -5,6 +5,7 @@ node_modules/
 build/
 .docusaurus/
 .cache-loader
+auth-app/.next/
 
 # Generated files
 .docusaurus
