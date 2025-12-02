@@ -44,7 +44,8 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
         setLoading(true);
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/chat", {
+            const apiUrl = process.env.NEXT_PUBLIC_CHATBOT_API_URL || "http://127.0.0.1:8000/chat";
+            const response = await fetch(apiUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
