@@ -1,6 +1,13 @@
 fastapi
-uvicorn
+uvicorn[standard]
 openai
-qdrant-client
-pydantic
 python-dotenv
+pydantic
+qdrant-client
+python-multipart
+httpx
+sqlalchemy
+psycopg2-binary
+alembic
+python-jose[cryptography]
+passlib[bcrypt]
