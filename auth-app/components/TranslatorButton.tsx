@@ -3,14 +3,16 @@ import React from 'react';
 interface TranslatorButtonProps {
     onClick: () => void;
     isTranslating: boolean;
-    isTranslated: boolean;
+    showTranslation?: boolean;
+    onToggle?: () => void;
     disabled?: boolean;
 }
 
 export default function TranslatorButton({
     onClick,
     isTranslating,
-    isTranslated,
+    showTranslation = false,
+    onToggle,
     disabled = false
 }: TranslatorButtonProps) {
     return (
@@ -20,14 +22,14 @@ export default function TranslatorButton({
             className={`
                 flex items-center space-x-2 px-4 py-2 rounded-lg font-medium
                 transition-all duration-200 border
-                ${isTranslated
+                ${showTranslation
                     ? 'bg-mint/20 text-mint border-mint hover:bg-mint/30'
                     : 'bg-goldenrod/10 text-goldenrod border-goldenrod/30 hover:bg-goldenrod/20'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed
                 focus:outline-none focus:ring-2 focus:ring-goldenrod/50
             `}
-            title={isTranslated ? 'Translated to Urdu (copied to clipboard)' : 'Translate to Urdu'}
+            title={showTranslation ? 'Translated to Urdu (copied to clipboard)' : 'Translate to Urdu'}
         >
             {isTranslating ? (
                 <>
@@ -73,7 +75,7 @@ export default function TranslatorButton({
                         <path d="m22 22-5-10-5 10" />
                         <path d="M14 18h6" />
                     </svg>
-                    <span>{isTranslated ? 'Translated ✓' : 'Translate to Urdu'}</span>
+                    <span>{showTranslation ? 'Translated ✓' : 'Translate to Urdu'}</span>
                 </>
             )}
         </button>

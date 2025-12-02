@@ -224,7 +224,7 @@ export default function BookReaderPage() {
                     </div>
                     <div className="flex items-center space-x-6">
                         {session ? (
-                            <UserMenu session={session} />
+                            <UserMenu />
                         ) : (
                             <div className="flex items-center space-x-4">
                                 <a

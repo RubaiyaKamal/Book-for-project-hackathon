@@ -136,7 +136,7 @@ Return ONLY the translated markdown content, nothing else.`
         // Clean old cache entries (simple cleanup)
         if (translationCache.size > 100) {
             const now = Date.now();
-            for (const [key, value] of translationCache.entries()) {
+            for (const [key, value] of Array.from(translationCache.entries())) {
                 if (now - value.timestamp > CACHE_DURATION) {
                     translationCache.delete(key);
                 }

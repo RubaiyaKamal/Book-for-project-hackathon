@@ -5,7 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface User {
-    email: string;
+    email?: string;
     id: string;
     name?: string;
     image?: string | null;

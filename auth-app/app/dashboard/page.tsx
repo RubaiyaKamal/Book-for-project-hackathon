@@ -1,21 +1,48 @@
 "use client";
 
-import { useAuth } from "@/components/providers/AuthProvider";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+interface UserProfile {
+    software_experience: string;
+    hardware_experience: string;
+    interests?: string[];
+}
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { user, loading, logout } = useAuth();
+    const { data: session, isPending } = authClient.useSession();
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loadingProfile, setLoadingProfile] = useState(true);
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!isPending && !session) {
             router.push("/signin");
         }
-    }, [user, loading, router]);
+    }, [session, isPending, router]);
 
-    if (loading || !user) {
+    useEffect(() => {
+        async function fetchProfile() {
+            if (session?.user) {
+                try {
+                    const response = await fetch("/api/profile");
+                    if (response.ok) {
+                        const data = await response.json();
+                        setProfile(data.profile);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch profile:", error);
+                } finally {
+                    setLoadingProfile(false);
+                }
+            }
+        }
+        fetchProfile();
+    }, [session]);
+
+    if (isPending || !session) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-warm-white dark:bg-dark-brown">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-goldenrod dark:border-goldenrod"></div>
@@ -23,7 +50,10 @@ export default function DashboardPage() {
         );
     }
 
-    const profile = user.profile;
+    const handleSignOut = async () => {
+        await authClient.signOut();
+        router.push("/signin");
+    };
 
     return (
         <div className="min-h-screen bg-warm-white dark:bg-dark-brown">
@@ -37,10 +67,10 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center">
                             <span className="mr-4 text-dark-brown dark:text-cream">
-                                Welcome, {user.email}
+                                Welcome, {session.user.email}
                             </span>
                             <button
-                                onClick={logout}
+                                onClick={handleSignOut}
                                 className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
                             >
                                 Sign Out
