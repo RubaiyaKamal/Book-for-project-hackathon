@@ -35,6 +35,11 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
         }
     }, [selectedText]);
 
+    const resetChat = () => {
+        setMessages([]);
+        setInput("");
+    };
+
     const sendMessage = async () => {
         if (!input.trim()) return;
 
@@ -68,9 +73,17 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
             setMessages((prev) => [...prev, assistantMessage]);
         } catch (error: any) {
             console.error("Chat error:", error);
+            let errorMsg = "Sorry, I couldn't connect to the chatbot service. ";
+
+            if (error.message.includes("Failed to fetch")) {
+                errorMsg += "Please make sure the chatbot API is running on http://127.0.0.1:8000";
+            } else {
+                errorMsg += error.message || "Something went wrong. Please try again.";
+            }
+
             const errorMessage: Message = {
                 role: "assistant",
-                content: `Error: ${error.message || "Something went wrong"}`,
+                content: errorMsg,
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
@@ -117,24 +130,36 @@ export default function Chatbot({ selectedText }: ChatbotProps) {
                     {/* Header */}
                     <div className="bg-goldenrod text-dark-brown p-4 rounded-t-lg flex justify-between items-center">
                         <h3 className="font-bold text-lg">Book Assistant</h3>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="hover:bg-dark-brown/10 p-1 rounded"
-                            aria-label="Close chatbot"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
+                        <div className="flex items-center space-x-2">
+                            {messages.length > 0 && (
+                                <button
+                                    onClick={resetChat}
+                                    className="hover:bg-dark-brown/10 p-2 rounded text-sm font-semibold"
+                                    aria-label="New chat"
+                                    title="Start new conversation"
+                                >
+                                    New Chat
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="hover:bg-dark-brown/10 p-1 rounded"
+                                aria-label="Close chatbot"
                             >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </button>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Messages */}

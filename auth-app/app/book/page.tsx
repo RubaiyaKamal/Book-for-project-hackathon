@@ -328,14 +328,27 @@ export default function BookReaderPage() {
                                         </div>
                                     </div>
 
+
                                     {/* Translator Button */}
                                     <div className="flex items-center space-x-2">
-                                        <TranslatorButton
-                                            onClick={handleTranslate}
-                                            isTranslating={isTranslating}
-                                            showTranslation={showTranslation}
-                                            onToggle={handleToggleTranslation}
-                                        />
+                                        {showTranslation && translatedContent ? (
+                                            <button
+                                                onClick={() => {
+                                                    setShowTranslation(false);
+                                                    setTranslatedContent("");
+                                                }}
+                                                className="px-4 py-2 text-sm bg-cream dark:bg-dark-brown text-dark-brown dark:text-cream rounded-lg hover:bg-goldenrod/20 transition-colors border border-dark-brown/10 dark:border-cream/10 font-semibold"
+                                            >
+                                                    (Reset to Original)
+                                            </button>
+                                        ) : (
+                                            <TranslatorButton
+                                                onClick={handleTranslate}
+                                                isTranslating={isTranslating}
+                                                showTranslation={showTranslation}
+                                                onToggle={handleToggleTranslation}
+                                            />
+                                        )}
                                     </div>
                                 </div>
 
