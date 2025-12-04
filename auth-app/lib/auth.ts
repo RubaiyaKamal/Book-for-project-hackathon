@@ -18,6 +18,7 @@ export const auth = betterAuth({
         "http://localhost:3000",
         "http://localhost:3001", // In case you run on different port
         "http://localhost:3002", // Current running port
+        "https://book-for-project-hackathon.onrender.com", // Production URL
         process.env.BETTER_AUTH_URL || "",
         process.env.NEXT_PUBLIC_APP_URL || "",
     ].filter(Boolean), // Remove empty strings
