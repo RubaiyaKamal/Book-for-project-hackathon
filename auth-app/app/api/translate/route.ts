@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         console.log(`API Key length: ${process.env.OPENAI_API_KEY?.length || 0}`);
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo", // Using gpt-3.5-turbo instead of gpt-4 for better availability
+            model: "gpt-4o-mini", // Using gpt-4o-mini for larger context (128K tokens) and better quality
             messages: [
                 {
                     role: "system",
@@ -114,7 +114,7 @@ Return ONLY the translated markdown content, nothing else.`
                 }
             ],
             temperature: 0.3, // Lower temperature for more consistent translations
-            max_tokens: 4000,
+            max_tokens: 16000, // Increased for longer translations
         });
 
         const markdownText = completion.choices[0]?.message?.content || '';
