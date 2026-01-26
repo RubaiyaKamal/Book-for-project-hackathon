@@ -1,13 +1,17 @@
 import os
 import re
+from dotenv import load_dotenv
 from openai import OpenAI
 from qdrant_client import QdrantClient, models
 import httpx
 
+# Load environment variables from .env file
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 # Environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
-QDRANT_URL = "https://95f917bd-5eae-4a33-bb5b-01706d914e55.europe-west3-0.gcp.cloud.qdrant.io"
-QDRANT_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.vGM2WFJKbHspSDW2Lw_zGMKEAE2aV_8JMOZQU6Y_Blo"
+QDRANT_URL = os.getenv("QDRANT_URL", "https://27f00c27-d682-4ed3-b4c5-4b7351588718.us-east4-0.gcp.cloud.qdrant.io")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.DjebkNlbUG4YraBUDGXfemv68x5PwFjH2lcDYMOyryE")
 
 # Initialize OpenAI client
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
@@ -17,10 +21,11 @@ if OPENAI_API_KEY == "sk-svcacct-tAWyjZoEeQU_tigEebuMBTkv8UxUAe1pZJkBNOrzGhMjZTu
 EMBEDDING_MODEL = "text-embedding-ada-002"
 EMBEDDING_DIMENSION = 1536 # Dimension for text-embedding-ada-002
 
-# Initialize Qdrant client
+# Initialize Qdrant client with timeout
 qdrant_client = QdrantClient(
     url=QDRANT_URL,
     api_key=QDRANT_API_KEY,
+    timeout=120,  # 120 seconds timeout
 )
 COLLECTION_NAME = "book_chunks"
 
@@ -71,31 +76,53 @@ def get_embeddings(texts):
 
 def upload_chunks_to_qdrant(chunks_data):
     # Ensure collection exists
-    if qdrant_client.collection_exists(COLLECTION_NAME):
+    try:
         qdrant_client.delete_collection(collection_name=COLLECTION_NAME)
+        print(f"Deleted existing collection '{COLLECTION_NAME}'.")
+    except Exception as e:
+        print(f"Collection '{COLLECTION_NAME}' doesn't exist or couldn't be deleted: {e}")
+
     qdrant_client.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=models.VectorParams(size=EMBEDDING_DIMENSION, distance=models.Distance.COSINE),
     )
 
-    points = []
-    for i, chunk in enumerate(chunks_data):
-        # Generate embedding for the chunk content
-        embedding = get_embeddings([chunk["content"]])[0]
-        points.append(
-            models.PointStruct(
-                id=i, # Simple incremental ID
-                vector=embedding,
-                payload=chunk["metadata"], # Store source filepath in metadata
+    # Upload in batches to avoid timeout
+    BATCH_SIZE = 10  # Upload 10 chunks at a time
+    total_uploaded = 0
+
+    for batch_start in range(0, len(chunks_data), BATCH_SIZE):
+        batch_end = min(batch_start + BATCH_SIZE, len(chunks_data))
+        batch_chunks = chunks_data[batch_start:batch_end]
+
+        print(f"Processing batch {batch_start}-{batch_end} ({len(batch_chunks)} chunks)...")
+
+        # Generate embeddings for the batch
+        batch_texts = [chunk["content"] for chunk in batch_chunks]
+        batch_embeddings = get_embeddings(batch_texts)
+
+        # Create points for this batch
+        points = []
+        for i, (chunk, embedding) in enumerate(zip(batch_chunks, batch_embeddings)):
+            points.append(
+                models.PointStruct(
+                    id=batch_start + i,  # Global ID
+                    vector=embedding,
+                    payload=chunk["metadata"],
+                )
             )
+
+        # Upload this batch
+        qdrant_client.upsert(
+            collection_name=COLLECTION_NAME,
+            wait=True,
+            points=points
         )
 
-    qdrant_client.upsert(
-        collection_name=COLLECTION_NAME,
-        wait=True,
-        points=points
-    )
-    print(f"Uploaded {len(points)} chunks to Qdrant collection '{COLLECTION_NAME}'.")
+        total_uploaded += len(points)
+        print(f"Uploaded batch. Total: {total_uploaded}/{len(chunks_data)} chunks")
+
+    print(f"Successfully uploaded all {total_uploaded} chunks to Qdrant collection '{COLLECTION_NAME}'.")
 
 def process_book_content_and_upload(docs_directory):
     all_chunks = []
