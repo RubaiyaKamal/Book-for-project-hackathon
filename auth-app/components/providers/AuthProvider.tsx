@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
@@ -15,7 +15,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     loading: boolean;
-    login: () => void; // No-op for Better Auth as it handles its own state
+    login: () => void;
     logout: () => Promise<void>;
 }
 
@@ -30,11 +30,38 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const { data: session, isPending, error } = authClient.useSession();
+    const [mounted, setMounted] = useState(false);
+    const router = useRouter();
+
+    // Only run on client after mount
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Default values for SSR
+    if (!mounted) {
+        return (
+            <AuthContext.Provider value={{
+                user: null,
+                isAuthenticated: false,
+                loading: true,
+                login: () => { },
+                logout: async () => { },
+            }}>
+                {children}
+            </AuthContext.Provider>
+        );
+    }
+
+    // Client-side only
+    return <AuthProviderClient>{children}</AuthProviderClient>;
+}
+
+function AuthProviderClient({ children }: { children: React.ReactNode }) {
+    const { data: session, isPending } = authClient.useSession();
     const router = useRouter();
 
     const login = () => {
-        // Better Auth handles login via its own client methods
         router.push("/signin");
     };
 
