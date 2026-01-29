@@ -1,6 +1,9 @@
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 
+// Force dynamic rendering to support Better Auth hooks
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Physical AI Course - Authentication',
   description: 'Join the Physical AI & Humanoid Robotics course',
