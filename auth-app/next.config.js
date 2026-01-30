@@ -17,6 +17,11 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+
+  // Force fresh build ID to prevent cache issues
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
 }
 
 module.exports = nextConfig
