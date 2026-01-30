@@ -1,0 +1,25 @@
+import Link from 'next/link'
+
+export default function NotFound() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="text-center px-4">
+        <h1 className="text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
+          404
+        </h1>
+        <h2 className="text-3xl font-semibold text-white mt-4 mb-2">
+          Page Not Found
+        </h2>
+        <p className="text-gray-400 mb-8 max-w-md mx-auto">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <Link
+          href="/"
+          className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          Go Back Home
+        </Link>
+      </div>
+    </div>
+  )
+}
